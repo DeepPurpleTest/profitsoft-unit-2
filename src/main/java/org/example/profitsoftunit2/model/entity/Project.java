@@ -6,6 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -39,7 +41,13 @@ public class Project {
 	@ToString.Exclude
 	private Set<Task> tasks = new HashSet<>();
 
-	@ManyToMany(mappedBy = "projects", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	//Cascade?
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "project_member",
+			joinColumns = @JoinColumn(name = "project_id"),
+			inverseJoinColumns = @JoinColumn(name = "member_id")
+	)
 	@ToString.Exclude
 	private Set<Member> members = new HashSet<>();
 }

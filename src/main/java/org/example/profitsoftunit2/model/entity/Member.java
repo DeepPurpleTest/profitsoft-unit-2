@@ -4,8 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -33,12 +31,7 @@ public class Member {
 
 	private String name;
 
-	@ManyToMany
-	@JoinTable(
-			name = "member_project",
-			joinColumns = @JoinColumn(name = "member_id"),
-			inverseJoinColumns = @JoinColumn(name = "project_id")
-	)
+	@ManyToMany(mappedBy = "members")
 	@ToString.Exclude
 	private Set<Project> projects = new HashSet<>();
 

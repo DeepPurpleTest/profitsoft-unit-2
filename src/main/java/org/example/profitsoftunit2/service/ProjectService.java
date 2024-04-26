@@ -1,5 +1,6 @@
 package org.example.profitsoftunit2.service;
 
+import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
 import org.example.profitsoftunit2.model.dto.ProjectPageSearchDto;
@@ -13,8 +14,6 @@ public interface ProjectService {
 
 	void createProject(ProjectDto projectDto);
 
-	void createProjects(List<ProjectDto> projectsDto);
-
 	ProjectDto findProjectById(Long id);
 
 	Optional<Project> findById(Long id);
@@ -27,5 +26,5 @@ public interface ProjectService {
 
 	List<ProjectDto> findAll(ProjectPageSearchDto searchDto);
 
-	String uploadDataFromFile(MultipartFile multipartFile);
+	ImportDto uploadDataFromFileToDb(MultipartFile multipartFile);
 }

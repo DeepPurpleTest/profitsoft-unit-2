@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
 import org.example.profitsoftunit2.mapper.ProjectMapper;
+import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
 import org.example.profitsoftunit2.model.dto.ProjectPageSearchDto;
@@ -14,15 +15,17 @@ import org.example.profitsoftunit2.processor.FileProcessor;
 import org.example.profitsoftunit2.repository.ProjectRepository;
 import org.example.profitsoftunit2.service.MemberService;
 import org.example.profitsoftunit2.service.ProjectService;
-import org.example.profitsoftunit2.service.TaskService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,7 +34,6 @@ public class ProjectServiceImpl implements ProjectService {
 
 	private final ProjectRepository projectRepository;
 	private final MemberService memberService;
-	private final TaskService taskService;
 	private final FileProcessor<ProjectDto> fileProcessor;
 	private final ProjectMapper projectMapper;
 
@@ -40,22 +42,6 @@ public class ProjectServiceImpl implements ProjectService {
 		Project project = projectMapper.toEntity(projectDto);
 
 		projectRepository.save(project);
-	}
-
-	@Override
-	public void createProjects(List<ProjectDto> projectsDto) {
-		List<Project> projects = projectMapper.mapAllToEntity(projectsDto);
-		log.info(projects.toString());
-
-		//TODO save + validation of entities
-		List<Project> successfullySaved = new ArrayList<>();
-		for (Project project : projects) {
-//			memberService.
-			Project saved = projectRepository.save(project);
-			successfullySaved.add(saved);
-		}
-//		List<Project> successfullySaved = projectRepository.saveAll(projects);
-		log.info(String.valueOf(successfullySaved.size()));
 	}
 
 	@Override
@@ -130,12 +116,48 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public String uploadDataFromFile(MultipartFile multipartFile) {
+	@Transactional
+	public ImportDto uploadDataFromFileToDb(MultipartFile multipartFile) {
 		List<ProjectDto> dtoProjects = fileProcessor.extractDataFromFile(multipartFile);
-		log.info(dtoProjects.toString());
+		List<Project> projects = projectMapper.mapAllToEntity(dtoProjects);
 
-		createProjects(dtoProjects);
-		return "extract data from file";
+		List<Project> successfullySaved = new ArrayList<>();
+		for (Project project : projects) {
+			if (validateProject(project)) {
+				Project savedProject = saveProject(project);
+				successfullySaved.add(savedProject);
+			}
+		}
+
+		log.info("Successfully saved projects: {}", successfullySaved.size());
+		return ImportDto.builder()
+				.successfullySaved(successfullySaved.size())
+				.failed(projects.size() - successfullySaved.size())
+				.build();
+	}
+
+	private Project saveProject(Project project) {
+		Set<Long> memberIds = project.getMembers().stream()
+				.map(Member::getId)
+				.collect(Collectors.toSet());
+		Set<Member> members = new HashSet<>(memberService.findAllByIds(memberIds));
+
+		project.setMembers(members);
+		return projectRepository.saveAndFlush(project);
+	}
+
+	private boolean validateProject(Project project) {
+		if (project.getId() != null && projectRepository.existsById(project.getId())) {
+			return false;
+		}
+
+		for (Member member : project.getMembers()) {
+			if (member.getId() == null || !memberService.existsById(member.getId())) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private Project updateFields(ProjectDto projectDto, Project project) {

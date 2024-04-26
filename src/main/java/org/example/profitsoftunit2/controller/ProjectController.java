@@ -4,12 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityValidationException;
+import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
 import org.example.profitsoftunit2.model.dto.ProjectPageSearchDto;
 import org.example.profitsoftunit2.service.ProjectService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,8 +86,8 @@ public class ProjectController {
 	}
 
 	@PostMapping("/upload")
-	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-		String response = projectService.uploadDataFromFile(file);
-		return ResponseEntity.ok().body(response);
+	@ResponseStatus(HttpStatus.OK)
+	public ImportDto uploadFile(@RequestParam("file") MultipartFile file) {
+		return projectService.uploadDataFromFileToDb(file);
 	}
 }

@@ -5,6 +5,7 @@ import org.example.profitsoftunit2.model.entity.Member;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface MemberService {
 
@@ -13,4 +14,8 @@ public interface MemberService {
 	void createMember(MemberDto memberDto);
 
 	List<MemberDto> findAllByProjectId(Long id);
+
+	List<Member> findAllByIds(Set<Long> ids);
+
+	boolean existsById(Long id);
 }
