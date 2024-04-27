@@ -7,7 +7,7 @@ import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
-import org.example.profitsoftunit2.model.dto.ProjectPageSearchDto;
+import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
 import org.example.profitsoftunit2.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -76,13 +76,13 @@ public class ProjectController {
 	}
 
 	@PostMapping("/_list")
-	public List<ProjectDto> findAll(@RequestBody @Valid ProjectPageSearchDto projectPageSearchDto,
+	public List<ProjectDto> findAll(@RequestBody @Valid ProjectSearchDto projectSearchDto,
 									BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		return projectService.findAll(projectPageSearchDto);
+		return projectService.findAll(projectSearchDto);
 	}
 
 	@PostMapping("/upload")

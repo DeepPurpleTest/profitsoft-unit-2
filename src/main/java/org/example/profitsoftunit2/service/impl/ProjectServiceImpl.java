@@ -8,7 +8,7 @@ import org.example.profitsoftunit2.mapper.ProjectMapper;
 import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
-import org.example.profitsoftunit2.model.dto.ProjectPageSearchDto;
+import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
 import org.example.profitsoftunit2.model.entity.Member;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.processor.FileProcessor;
@@ -109,10 +109,11 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public List<ProjectDto> findAll(ProjectPageSearchDto searchDto) {
+	public List<ProjectDto> findAll(ProjectSearchDto searchDto) {
 		Pageable pageable = PageRequest.of(searchDto.getPage(), searchDto.getSize());
+		List<Project> projects = projectRepository.findWithFiltration(pageable, searchDto);
 
-		return projectMapper.mapAllToDto(projectRepository.findAllBy(pageable));
+		return projectMapper.mapAllToDto(projects);
 	}
 
 	@Override
@@ -123,6 +124,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 		List<Project> successfullySaved = new ArrayList<>();
 		for (Project project : projects) {
+			//TODO save if valid in save
 			if (validateProject(project)) {
 				Project savedProject = saveProject(project);
 				successfullySaved.add(savedProject);
@@ -163,8 +165,8 @@ public class ProjectServiceImpl implements ProjectService {
 	private Project updateFields(ProjectDto projectDto, Project project) {
 		Project projectToUpdate = new Project();
 		projectToUpdate.setId(project.getId());
-		projectToUpdate.setName(projectDto.getName() == null? project.getName() : projectDto.getName());
-		projectToUpdate.setDescription(projectDto.getDescription() == null?
+		projectToUpdate.setName(projectDto.getName() == null ? project.getName() : projectDto.getName());
+		projectToUpdate.setDescription(projectDto.getDescription() == null ?
 				project.getDescription() : projectDto.getDescription());
 		projectToUpdate.setMembers(project.getMembers());
 		projectToUpdate.setTasks(project.getTasks());
