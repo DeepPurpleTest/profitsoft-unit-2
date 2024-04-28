@@ -23,6 +23,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 
 	private final EntityManager em;
 
+	//TODO refactor methods
 	@Override
 	public List<Project> findWithFiltrationAndPagination(ProjectSearchDto searchDto) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
