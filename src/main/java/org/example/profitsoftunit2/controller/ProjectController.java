@@ -8,7 +8,6 @@ import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
 import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
-import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.service.ExcelService;
 import org.example.profitsoftunit2.service.ProjectService;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -106,8 +106,8 @@ public class ProjectController {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		List<Project> projects = projectService.findAll(projectSearchDto);
-		byte[] fileContent = excelService.generateFile(projects);
+		List<Object> objects = new ArrayList<>(projectService.findAll(projectSearchDto));
+		byte[] fileContent = excelService.generateFile(objects, ProjectDto.class);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

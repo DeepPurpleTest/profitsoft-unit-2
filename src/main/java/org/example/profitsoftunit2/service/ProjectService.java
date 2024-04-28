@@ -26,7 +26,7 @@ public interface ProjectService {
 
 	List<ProjectDto> findAllWithPagination(ProjectSearchDto searchDto);
 
-	List<Project> findAll(ProjectSearchDto searchDto);
+	List<ProjectDto> findAll(ProjectSearchDto searchDto);
 
 	ImportDto uploadDataFromFileToDb(MultipartFile multipartFile);
 }

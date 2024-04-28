@@ -115,8 +115,8 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public List<Project> findAll(ProjectSearchDto searchDto) {
-		return projectRepository.findWithFiltration(searchDto);
+	public List<ProjectDto> findAll(ProjectSearchDto searchDto) {
+		return projectMapper.mapAllToDto(projectRepository.findWithFiltration(searchDto));
 	}
 
 	@Override

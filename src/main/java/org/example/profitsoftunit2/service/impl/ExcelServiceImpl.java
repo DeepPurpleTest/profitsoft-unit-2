@@ -29,12 +29,12 @@ import static org.example.profitsoftunit2.util.ReflectionUtils.isTypeCollection;
 @RequiredArgsConstructor
 public class ExcelServiceImpl implements ExcelService {
 
-	public byte[] generateFile(List<Project> projects) throws IllegalAccessException {
+	public byte[] generateFile(List<Object> objects, Class<?> type) throws IllegalAccessException {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("Projects");
 
 		createHeaderRow(sheet);
-		writeDataRows(sheet, projects);
+		writeDataRows(sheet, objects, type);
 
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			workbook.write(outputStream);
@@ -59,19 +59,19 @@ public class ExcelServiceImpl implements ExcelService {
 		}
 	}
 
-	private void writeDataRows(Sheet sheet, List<Project> projects) throws IllegalAccessException {
-		Field[] entityFields = getObjectFields(Project.class);
-		for (int i = 0; i < projects.size(); i++) {
+	private void writeDataRows(Sheet sheet, List<Object> objects, Class<?> type) throws IllegalAccessException {
+		Field[] entityFields = getObjectFields(type);
+		for (int i = 0; i < objects.size(); i++) {
 			Row row = sheet.createRow(i + 1);
 			for (int j = 0; j < entityFields.length; j++) {
 				Cell cell = row.createCell(j);
 				Field field = entityFields[j];
 				Object value;
 				if (isTypeCollection(field.getType())) {
-					Collection<?> fieldValue = (Collection<?>) field.get(projects.get(i));
+					Collection<?> fieldValue = (Collection<?>) field.get(objects.get(i));
 					value = mapCollectionToString(fieldValue);
 				} else {
-					value = field.get(projects.get(i));
+					value = field.get(objects.get(i));
 				}
 
 				cell.setCellValue(value != null ? value.toString() : "");
