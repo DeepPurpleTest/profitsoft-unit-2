@@ -41,15 +41,15 @@ public class ReflectionUtils {
 		return annotation.value();
 	}
 
-	public boolean isTypeCollection(Class<?> type) {
+	public static boolean isTypeCollection(Class<?> type) {
 		return Collection.class.isAssignableFrom(type);
 	}
 
-	public Object getFieldValueByName(Object object, String fieldName) {
+	public static Object getFieldValueByName(Object object, String fieldName) {
 		try {
 			Field nameField = object.getClass().getDeclaredField(fieldName);
 			nameField.setAccessible(true);
-			return nameField.get(fieldName);
+			return nameField.get(object);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			log.warn("Field with name {} not found", fieldName);
 		}

@@ -11,7 +11,10 @@ import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.service.ExcelService;
 import org.example.profitsoftunit2.service.ProjectService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -95,15 +98,21 @@ public class ProjectController {
 		return projectService.uploadDataFromFileToDb(file);
 	}
 
-	@PostMapping("_report")
+	@PostMapping(value = "_report", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public void generateReport(@RequestBody @Valid ProjectSearchDto projectSearchDto,
-							   BindingResult bindingResult) throws IOException, IllegalAccessException {
+	public ResponseEntity<byte[]> generateReport(@RequestBody @Valid ProjectSearchDto projectSearchDto,
+												   BindingResult bindingResult) throws IllegalAccessException, IOException {
 		if(bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
 		List<Project> projects = projectService.findAll(projectSearchDto);
-		excelService.writeProjectsInFile(projects);
+		byte[] fileContent = excelService.generateFile(projects);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentDispositionFormData("attachment", "projects.xlsx");
+
+		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
 	}
 }
