@@ -17,7 +17,7 @@ public class ProjectSearchDto {
 	@JsonProperty("members_names")
 	private List<String> membersNames;
 
-	private int page;
+	private int offset;
 
-	private int size;
+	private int pageSize;
 }

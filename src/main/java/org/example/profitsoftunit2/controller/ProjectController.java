@@ -8,6 +8,8 @@ import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
 import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
+import org.example.profitsoftunit2.model.entity.Project;
+import org.example.profitsoftunit2.service.ExcelService;
 import org.example.profitsoftunit2.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -33,6 +36,7 @@ import java.util.List;
 public class ProjectController {
 
 	private final ProjectService projectService;
+	private final ExcelService excelService;
 
 	@PostMapping()
 	@ResponseStatus(HttpStatus.CREATED)
@@ -82,12 +86,24 @@ public class ProjectController {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		return projectService.findAll(projectSearchDto);
+		return projectService.findAllWithPagination(projectSearchDto);
 	}
 
 	@PostMapping("/upload")
 	@ResponseStatus(HttpStatus.OK)
 	public ImportDto uploadFile(@RequestParam("file") MultipartFile file) {
 		return projectService.uploadDataFromFileToDb(file);
+	}
+
+	@PostMapping("_report")
+	@ResponseStatus(HttpStatus.OK)
+	public void generateReport(@RequestBody @Valid ProjectSearchDto projectSearchDto,
+							   BindingResult bindingResult) throws IOException, IllegalAccessException {
+		if(bindingResult.hasErrors()) {
+			throw new EntityValidationException("Incorrect search data", bindingResult);
+		}
+
+		List<Project> projects = projectService.findAll(projectSearchDto);
+		excelService.writeProjectsInFile(projects);
 	}
 }

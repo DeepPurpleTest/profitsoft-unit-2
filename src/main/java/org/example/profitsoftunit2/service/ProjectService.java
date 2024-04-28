@@ -24,7 +24,9 @@ public interface ProjectService {
 
 	Long deleteProjectById(Long id);
 
-	List<ProjectDto> findAll(ProjectSearchDto searchDto);
+	List<ProjectDto> findAllWithPagination(ProjectSearchDto searchDto);
+
+	List<Project> findAll(ProjectSearchDto searchDto);
 
 	ImportDto uploadDataFromFileToDb(MultipartFile multipartFile);
 }

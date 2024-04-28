@@ -15,8 +15,6 @@ import org.example.profitsoftunit2.processor.FileProcessor;
 import org.example.profitsoftunit2.repository.ProjectRepository;
 import org.example.profitsoftunit2.service.MemberService;
 import org.example.profitsoftunit2.service.ProjectService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -108,12 +106,17 @@ public class ProjectServiceImpl implements ProjectService {
 		return id;
 	}
 
+	//TODO not all project fields
 	@Override
-	public List<ProjectDto> findAll(ProjectSearchDto searchDto) {
-		Pageable pageable = PageRequest.of(searchDto.getPage(), searchDto.getSize());
-		List<Project> projects = projectRepository.findWithFiltration(pageable, searchDto);
+	public List<ProjectDto> findAllWithPagination(ProjectSearchDto searchDto) {
+		List<Project> projects = projectRepository.findWithFiltrationAndPagination(searchDto);
 
 		return projectMapper.mapAllToDto(projects);
+	}
+
+	@Override
+	public List<Project> findAll(ProjectSearchDto searchDto) {
+		return projectRepository.findWithFiltration(searchDto);
 	}
 
 	@Override

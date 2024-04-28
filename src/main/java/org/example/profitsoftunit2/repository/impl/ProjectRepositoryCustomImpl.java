@@ -12,7 +12,6 @@ import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.repository.ProjectRepositoryCustom;
 import org.example.profitsoftunit2.service.strategy.FilterStrategy;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 	private final EntityManager em;
 
 	@Override
-	public List<Project> findWithFiltration(Pageable pageable, ProjectSearchDto searchDto) {
+	public List<Project> findWithFiltrationAndPagination(ProjectSearchDto searchDto) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
 
@@ -42,8 +41,28 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 		cq.where(predicates.toArray(new Predicate[0]));
 
 		TypedQuery<Project> typedQuery = em.createQuery(cq);
-		typedQuery.setFirstResult((int) pageable.getOffset());
-		typedQuery.setMaxResults(pageable.getPageSize());
+		typedQuery.setFirstResult(searchDto.getOffset());
+		typedQuery.setMaxResults(searchDto.getPageSize());
+
+		return em.createQuery(cq).getResultList();
+	}
+
+	@Override
+	public List<Project> findWithFiltration(ProjectSearchDto searchDto) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
+
+		Root<Project> project = cq.from(Project.class);
+		List<Predicate> predicates = new ArrayList<>();
+
+		for (FilterStrategy strategy : createFilterStrategyList(searchDto)) {
+			Predicate predicate = strategy.createPredicate(project, cb);
+			if (predicate != null) {
+				predicates.add(predicate);
+			}
+		}
+
+		cq.where(predicates.toArray(new Predicate[0]));
 
 		return em.createQuery(cq).getResultList();
 	}
