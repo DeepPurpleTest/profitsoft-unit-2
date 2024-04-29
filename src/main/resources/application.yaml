@@ -18,7 +18,8 @@ spring:
         format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
-
+      ddl-auto: none
+  liquibase:
+    enabled: true
 
 

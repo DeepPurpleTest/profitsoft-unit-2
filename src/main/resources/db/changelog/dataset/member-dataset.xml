@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+	<changeSet id="member dataset" author="Moksem">
+		<insert tableName="member">
+			<column name="name" value="Moksem"/>
+		</insert>
+		<insert tableName="member">
+			<column name="name" value="Vodem"/>
+		</insert>
+		<insert tableName="member">
+			<column name="name" value="Denchik"/>
+		</insert>
+		<insert tableName="member">
+			<column name="name" value="Maus"/>
+		</insert>
+		<rollback>
+			DELETE FROM member;
+		</rollback>
+	</changeSet>
+</databaseChangeLog>

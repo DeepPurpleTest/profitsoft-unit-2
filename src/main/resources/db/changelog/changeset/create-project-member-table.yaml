@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-project-member
+      author: Moksem
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: project_member
+
+      changes:
+        - createTable:
+            tableName: project_member
+            columns:
+              - column:
+                  name: project_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: project_fk
+                    referencedTableName: project
+                    referencedColumnNames: id
+                    nullable: false
+
+              - column:
+                  name: member_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: member_fk
+                    referencedTableName: member
+                    referencedColumnNames: id
+                    nullable: false

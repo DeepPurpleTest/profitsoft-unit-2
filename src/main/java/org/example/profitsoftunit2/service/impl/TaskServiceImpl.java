@@ -79,6 +79,6 @@ public class TaskServiceImpl implements TaskService {
 		task.setProject(byId.orElseThrow(() -> new EntityNotFoundException(
 				String.format("Project with id: %d", task.getProject().getId()))));
 		task.setReporter(reporterById.orElseThrow(() -> new EntityNotFoundException(
-				String.format("Member creator with id: %d", task.getProject().getId()))));
+				String.format("Member reporter with id: %d", task.getProject().getId()))));
 	}
 }

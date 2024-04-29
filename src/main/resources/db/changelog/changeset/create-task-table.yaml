@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-task
+      author: Moksem
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: task
+
+      changes:
+        - createTable:
+            tableName: task
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: description
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: member_assignee_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: task_member_assignee_fk
+                    referencedTableName: member
+                    referencedColumnNames: id
+                    nullable: false
+
+              - column:
+                  name: member_reporter_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: task_member_reporter_fk
+                    referencedTableName: member
+                    referencedColumnNames: id
+                    nullable: false
+
+              - column:
+                  name: project_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: task_project_fk
+                    referencedTableName: project
+                    referencedColumnNames: id
+                    nullable: false

@@ -1,0 +1,18 @@
+databaseChangeLog:
+  ### changes
+  - include:
+      file: db/changelog/changeset/create-project-table.yaml
+  - include:
+      file: db/changelog/changeset/create-member-table.yaml
+  - include:
+      file: db/changelog/changeset/create-project-member-table.yaml
+  - include:
+      file: db/changelog/changeset/create-task-table.yaml
+
+  ### datasets
+  - include:
+      file: db/changelog/dataset/member-dataset.xml
+  - include:
+      file: db/changelog/dataset/project-dataset.xml
+  - include:
+      file: db/changelog/dataset/project-member-dataset.xml
