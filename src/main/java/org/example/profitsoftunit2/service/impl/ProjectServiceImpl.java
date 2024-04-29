@@ -58,8 +58,9 @@ public class ProjectServiceImpl implements ProjectService {
 		return projectRepository.findById(id);
 	}
 
+	//TODO all field requested and need to check if the are relevant
 	@Override
-	public ProjectDto updateProjectById(ProjectDto projectDto, Long id) {
+	public void updateProjectById(ProjectDto projectDto, Long id) {
 		Optional<Project> byId = projectRepository.findById(id);
 
 		if (byId.isEmpty()) {
@@ -67,9 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
 		}
 
 		Project project = updateFields(projectDto, byId.get());
-		Project updatedProject = projectRepository.save(project);
-
-		return projectMapper.toDto(updatedProject);
+		projectRepository.save(project);
 	}
 
 	@Override
@@ -95,14 +94,11 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Override
 	public Long deleteProjectById(Long id) {
-		Optional<Project> byId = projectRepository.findById(id);
-
-		if (byId.isEmpty()) {
-			throw new EntityNotFoundException(String.format("Project with id: %d not found", id));
+		if (!projectRepository.existsById(id)) {
+			throw new EntityNotFoundException(String.format("Project with id:%d is not found", id));
 		}
 
 		projectRepository.deleteById(id);
-
 		return id;
 	}
 
@@ -120,44 +116,59 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
+	public List<Project> findAllByIds(List<Long> ids) {
+		List<Project> existingProjects = projectRepository.findAllById(ids);
+		Set<Long> existingIds = existingProjects.stream()
+				.map(Project::getId)
+				.collect(Collectors.toSet());
+
+		if (existingIds.size() < ids.size()) {
+			List<Long> notFoundIds = new ArrayList<>(ids);
+			notFoundIds.removeAll(existingIds);
+			throw new EntityNotFoundException(String.format("Projects with ids %s are not found", notFoundIds));
+		}
+
+		return existingProjects;
+	}
+
+	@Override
 	@Transactional
 	public ImportDto uploadDataFromFileToDb(MultipartFile multipartFile) {
 		List<ProjectDto> dtoProjects = fileProcessor.extractDataFromFile(multipartFile);
 		List<Project> projects = projectMapper.mapAllToEntity(dtoProjects);
 
-		List<Project> successfullySaved = new ArrayList<>();
-		for (Project project : projects) {
-			//TODO save if valid in save
-			if (validateProject(project)) {
-				Project savedProject = saveProject(project);
-				successfullySaved.add(savedProject);
-			}
-		}
+		List<Project> validProjects = projects.stream()
+				.filter(this::validateProject)
+				.map(this::addDataToProject)
+				.toList();
+		List<Project> savedProjects = projectRepository.saveAllAndFlush(validProjects);
 
-		log.info("Successfully saved projects: {}", successfullySaved.size());
+		log.info("Successfully saved projects: {}", savedProjects.size());
 		return ImportDto.builder()
-				.successfullySaved(successfullySaved.size())
-				.failed(projects.size() - successfullySaved.size())
+				.successfullySaved(savedProjects.size())
+				.failed(projects.size() - savedProjects.size())
 				.build();
 	}
 
-	private Project saveProject(Project project) {
+	private Project addDataToProject(Project project) {
 		Set<Long> memberIds = project.getMembers().stream()
 				.map(Member::getId)
 				.collect(Collectors.toSet());
 		Set<Member> members = new HashSet<>(memberService.findAllByIds(memberIds));
 
 		project.setMembers(members);
-		return projectRepository.saveAndFlush(project);
+		return project;
 	}
 
 	private boolean validateProject(Project project) {
 		if (project.getId() != null && projectRepository.existsById(project.getId())) {
+			log.warn("Project with id:{} is already exist", project.getId());
 			return false;
 		}
 
 		for (Member member : project.getMembers()) {
 			if (member.getId() == null || !memberService.existsById(member.getId())) {
+				log.warn("Invalid member id:{}", member.getId());
 				return false;
 			}
 		}

@@ -18,7 +18,7 @@ public interface ProjectService {
 
 	Optional<Project> findById(Long id);
 
-	ProjectDto updateProjectById(ProjectDto projectDto, Long id);
+	void updateProjectById(ProjectDto projectDto, Long id);
 
 	ProjectDto addMemberToProject(MemberDto memberDto, Long id);
 
@@ -27,6 +27,8 @@ public interface ProjectService {
 	List<ProjectDto> findAllWithPagination(ProjectSearchDto searchDto);
 
 	List<ProjectDto> findAll(ProjectSearchDto searchDto);
+
+	List<Project> findAllByIds(List<Long> ids);
 
 	ImportDto uploadDataFromFileToDb(MultipartFile multipartFile);
 }

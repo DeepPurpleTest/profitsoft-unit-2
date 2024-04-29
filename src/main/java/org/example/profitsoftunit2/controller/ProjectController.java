@@ -57,23 +57,14 @@ public class ProjectController {
 	}
 
 	@PutMapping("/{id}")
-	public ProjectDto updateProject(@PathVariable("id") Long id, @RequestBody @Valid ProjectDto projectDto,
+	@ResponseStatus(HttpStatus.OK)
+	public void updateProject(@PathVariable("id") Long id, @RequestBody @Valid ProjectDto projectDto,
 									BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect Project data", bindingResult);
 		}
 
-		return projectService.updateProjectById(projectDto, id);
-	}
-
-	@PatchMapping("/{id}")
-	public ProjectDto addMemberToProject(@PathVariable("id") Long id, @RequestBody @Valid MemberDto memberDto,
-										 BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			throw new EntityValidationException("Incorrect Member data", bindingResult);
-		}
-
-		return projectService.addMemberToProject(memberDto, id);
+		projectService.updateProjectById(projectDto, id);
 	}
 
 	@DeleteMapping("/{id}")
@@ -89,7 +80,9 @@ public class ProjectController {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		return projectService.findAllWithPagination(projectSearchDto);
+		List<ProjectDto> projects = projectService.findAllWithPagination(projectSearchDto);
+		log.info("size of projects {}", projects.size());
+		return projects;
 	}
 
 	@PostMapping("/upload")
@@ -107,7 +100,7 @@ public class ProjectController {
 		}
 
 		List<Object> objects = new ArrayList<>(projectService.findAll(projectSearchDto));
-		byte[] fileContent = excelService.generateFile(objects, ProjectDto.class);
+		byte[] fileContent = excelService.generateFile(objects, ProjectDto.class, "Projects");
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

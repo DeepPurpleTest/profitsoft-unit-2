@@ -28,75 +28,76 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 	public List<Project> findWithFiltrationAndPagination(ProjectSearchDto searchDto) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
-
 		Root<Project> project = cq.from(Project.class);
-		List<Predicate> predicates = new ArrayList<>();
 
-		for (FilterStrategy strategy : createFilterStrategyList(searchDto)) {
-			Predicate predicate = strategy.createPredicate(project, cb);
-			if (predicate != null) {
-				predicates.add(predicate);
-			}
-		}
-
+		List<Predicate> predicates = createPredicates(cb, project, searchDto);
 		cq.where(predicates.toArray(new Predicate[0]));
 
-		TypedQuery<Project> typedQuery = em.createQuery(cq);
-		typedQuery.setFirstResult(searchDto.getOffset());
-		typedQuery.setMaxResults(searchDto.getPageSize());
-
-		return em.createQuery(cq).getResultList();
+		TypedQuery<Project> typedQuery = createPaginatedQuery(cq, searchDto.getOffset(), searchDto.getPageSize());
+		return typedQuery.getResultList();
 	}
 
 	@Override
 	public List<Project> findWithFiltration(ProjectSearchDto searchDto) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
-
 		Root<Project> project = cq.from(Project.class);
-		List<Predicate> predicates = new ArrayList<>();
 
-		for (FilterStrategy strategy : createFilterStrategyList(searchDto)) {
-			Predicate predicate = strategy.createPredicate(project, cb);
-			if (predicate != null) {
-				predicates.add(predicate);
-			}
-		}
-
+		List<Predicate> predicates = createPredicates(cb, project, searchDto);
 		cq.where(predicates.toArray(new Predicate[0]));
 
 		return em.createQuery(cq).getResultList();
 	}
 
+	private TypedQuery<Project> createPaginatedQuery(CriteriaQuery<Project> cq, int offset, int pageSize) {
+		TypedQuery<Project> typedQuery = em.createQuery(cq);
+		typedQuery.setFirstResult(offset);
+		typedQuery.setMaxResults(pageSize);
+		return typedQuery;
+	}
+
+	private List<Predicate> createPredicates(CriteriaBuilder cb, Root<Project> project, ProjectSearchDto searchDto) {
+		List<Predicate> predicates = new ArrayList<>();
+		for (FilterStrategy strategy : createFilterStrategyList(searchDto)) {
+			Predicate predicate = strategy.createPredicate(project, cb);
+			predicates.add(predicate);
+		}
+
+		return predicates;
+	}
+
 	private List<FilterStrategy> createFilterStrategyList(ProjectSearchDto searchDto) {
 		List<FilterStrategy> predicates = new ArrayList<>();
+
 		predicates.add((root, cb) -> equalPredicate(cb, root.get("name"), searchDto.getProjectName()));
-		predicates.add((root, cb) -> cb.and(memberIdsPredicate(root, searchDto.getMembersIds()).toArray(new Predicate[0])));
-		predicates.add((root, cb) -> cb.and(memberNamesPredicate(root, searchDto.getMembersNames()).toArray(new Predicate[0])));
+		predicates.add((root, cb) -> cb.and(memberIdsPredicate(root, searchDto.getMembersIds())));
+		predicates.add((root, cb) -> cb.and(memberNamesPredicate(root, searchDto.getMembersNames())));
 
 		return predicates;
 	}
 
 	private Predicate equalPredicate(CriteriaBuilder cb, Path<String> path, String value) {
-		return value != null ?
-				cb.equal(path, value) : null;
+		return value != null ? cb.equal(path, value) : cb.conjunction();
 	}
 
-	private List<Predicate> memberIdsPredicate(Root<Project> root, List<Long> memberIds) {
+	private Predicate[] memberIdsPredicate(Root<Project> root, List<Long> memberIds) {
 		return createMemberPredicate(root, memberIds, "id");
 	}
 
-	private List<Predicate> memberNamesPredicate(Root<Project> root, List<String> memberNames) {
+	private Predicate[] memberNamesPredicate(Root<Project> root, List<String> memberNames) {
 		return createMemberPredicate(root, memberNames, "name");
 	}
 
-	private List<Predicate> createMemberPredicate(Root<Project> root, List<?> memberList, String attributeName) {
-		List<Predicate> predicates = new ArrayList<>();
-		if (memberList != null && !memberList.isEmpty()) {
-			for (Object member : memberList) {
-				predicates.add(root.join("members").get(attributeName).in(member));
-			}
+	private Predicate[] createMemberPredicate(Root<Project> root, List<?> memberList, String attributeName) {
+		if (memberList == null || memberList.isEmpty()) {
+			return new Predicate[0];
 		}
-		return predicates;
+
+		List<Predicate> predicates = new ArrayList<>();
+		for (Object member : memberList) {
+			predicates.add(root.join("members").get(attributeName).in(member));
+		}
+
+		return predicates.toArray(new Predicate[0]);
 	}
 }

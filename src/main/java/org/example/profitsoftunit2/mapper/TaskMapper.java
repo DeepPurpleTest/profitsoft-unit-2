@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import java.util.List;
+
 import static org.mapstruct.ReportingPolicy.ERROR;
 import static org.mapstruct.ReportingPolicy.IGNORE;
 
@@ -13,7 +15,6 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 		unmappedSourcePolicy = IGNORE,
 		componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TaskMapper {
-//	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "reporter.id", source = "reporterId")
 	@Mapping(target = "assignee.id", source = "assigneeId")
 	@Mapping(target = "project.id", source = "projectId")
@@ -23,4 +24,6 @@ public interface TaskMapper {
 	@Mapping(target = "assigneeId", source = "assignee.id")
 	@Mapping(target = "projectId", source = "project.id")
 	TaskDto toDto(Task task);
+
+	List<TaskDto> mapAllToDto(List<Task> taskList);
 }

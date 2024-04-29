@@ -3,6 +3,7 @@ package org.example.profitsoftunit2.mapper;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.entity.Member;
 import org.example.profitsoftunit2.model.entity.Project;
+import org.example.profitsoftunit2.model.entity.Task;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,9 +37,17 @@ public interface MemberMapper {
 				.toList();
 	}
 
+	default List<Long> mapTasks(Set<Task> projects) {
+		return projects.stream()
+				.map(Task::getId)
+				.toList();
+	}
+
 	@AfterMapping
 	default void mapProjectsToMember(Member member, @MappingTarget MemberDto.MemberDtoBuilder builder) {
 		builder.projectsIds(mapProjects(member.getProjects()));
+		builder.assignedTasksIds(mapTasks(member.getAssignedTasks()));
+		builder.createdTasksIds(mapTasks(member.getCreatedTasks()));
 	}
 
 	List<MemberDto> mapAllToDto(List<Member> members);

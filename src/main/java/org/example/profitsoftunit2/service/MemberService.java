@@ -13,9 +13,15 @@ public interface MemberService {
 
 	void createMember(MemberDto memberDto);
 
+	List<MemberDto> findAll();
+
 	List<MemberDto> findAllByProjectId(Long id);
 
 	List<Member> findAllByIds(Set<Long> ids);
 
 	boolean existsById(Long id);
+
+	Long deleteById(Long id);
+
+	void updateMemberById(MemberDto memberDto, Long id);
 }

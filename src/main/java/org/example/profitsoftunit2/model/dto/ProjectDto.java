@@ -21,7 +21,7 @@ public class ProjectDto {
 
 	private String description;
 
-	private List<MemberDto> members;
-
 	private List<TaskDto> tasks;
+
+	private List<MemberDto> members;
 }

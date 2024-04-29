@@ -15,6 +15,7 @@ import org.example.profitsoftunit2.service.ProjectService;
 import org.example.profitsoftunit2.service.TaskService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -40,6 +41,31 @@ public class TaskServiceImpl implements TaskService {
 		setUpTask(task);
 
 		taskRepository.save(task);
+	}
+
+	@Override
+	public List<TaskDto> findAll() {
+		return taskMapper.mapAllToDto(taskRepository.findAll());
+	}
+
+	@Override
+	public List<Task> findAllByIdList(List<Long> ids) {
+		return taskRepository.findAllById(ids);
+	}
+
+	@Override
+	public Long deleteById(Long id) {
+		if (!taskRepository.existsById(id)) {
+			throw new EntityNotFoundException(String.format("Task with id:%d is not found", id));
+		}
+
+		taskRepository.deleteById(id);
+		return id;
+	}
+
+	//TODO all field requested and need to check if the are relevant
+	@Override
+	public void updateTaskById(TaskDto taskDto, Long id) {
 	}
 
 	//TODO check members in current project

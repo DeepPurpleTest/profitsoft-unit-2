@@ -29,9 +29,9 @@ import static org.example.profitsoftunit2.util.ReflectionUtils.isTypeCollection;
 @RequiredArgsConstructor
 public class ExcelServiceImpl implements ExcelService {
 
-	public byte[] generateFile(List<Object> objects, Class<?> type) throws IllegalAccessException {
+	public byte[] generateFile(List<Object> objects, Class<?> type, String sheetName) throws IllegalAccessException {
 		Workbook workbook = new XSSFWorkbook();
-		Sheet sheet = workbook.createSheet("Projects");
+		Sheet sheet = workbook.createSheet(sheetName);
 
 		createHeaderRow(sheet);
 		writeDataRows(sheet, objects, type);
@@ -51,11 +51,9 @@ public class ExcelServiceImpl implements ExcelService {
 		Row header = sheet.createRow(0);
 		List<String> cellsNames = getNames(Project.class);
 
-		int cellIndex = 0;
-		for (String cellName : cellsNames) {
-			Cell headerCell = header.createCell(cellIndex);
-			headerCell.setCellValue(cellName);
-			cellIndex++;
+		for (int i = 0; i < cellsNames.size(); i++) {
+			Cell headerCell = header.createCell(i);
+			headerCell.setCellValue(cellsNames.get(i));
 		}
 	}
 
@@ -63,20 +61,22 @@ public class ExcelServiceImpl implements ExcelService {
 		Field[] entityFields = getObjectFields(type);
 		for (int i = 0; i < objects.size(); i++) {
 			Row row = sheet.createRow(i + 1);
+			Object object = objects.get(i);
 			for (int j = 0; j < entityFields.length; j++) {
 				Cell cell = row.createCell(j);
-				Field field = entityFields[j];
-				Object value;
-				if (isTypeCollection(field.getType())) {
-					Collection<?> fieldValue = (Collection<?>) field.get(objects.get(i));
-					value = mapCollectionToString(fieldValue);
-				} else {
-					value = field.get(objects.get(i));
-				}
-
-				cell.setCellValue(value != null ? value.toString() : "");
+				fillCell(cell, entityFields[j], object);
 			}
 		}
+	}
+
+	private void fillCell(Cell cell, Field field, Object object) throws IllegalAccessException {
+		Object value = field.get(object);
+		if (value instanceof Collection<?> collectionValue) {
+			value = mapCollectionToString(collectionValue);
+		}
+
+		String cellValue = (value != null) ? value.toString() : "";
+		cell.setCellValue(cellValue);
 	}
 
 	private String mapCollectionToString(Collection<?> collection) {
