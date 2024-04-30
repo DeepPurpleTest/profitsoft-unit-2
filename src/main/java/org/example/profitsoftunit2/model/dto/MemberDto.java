@@ -1,5 +1,6 @@
 package org.example.profitsoftunit2.model.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,9 @@ public class MemberDto {
 
 	@NotEmpty(message = "Name is mandatory")
 	private String name;
+
+	@Email
+	private String email;
 
 	private List<Long> projectsIds;
 

@@ -1,6 +1,7 @@
 package org.example.profitsoftunit2.mapper;
 
 import org.example.profitsoftunit2.model.dto.ProjectDto;
+import org.example.profitsoftunit2.model.dto.SimpleProjectDto;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
@@ -27,9 +28,13 @@ public interface ProjectMapper {
 	@Named("fullProjectMapper")
 	Project toFullEntity(ProjectDto projectDto);
 
+	SimpleProjectDto toSimpleDto(Project project);
+
 	ProjectDto toDto(Project project);
 
 	List<ProjectDto> mapAllToDto(List<Project> projects);
+
+	List<SimpleProjectDto> mapAllToSimpleDto(List<Project> projects);
 
 	@IterableMapping(qualifiedByName = "fullProjectMapper")
 	List<Project> mapAllToEntity(List<ProjectDto> dtoProjects);

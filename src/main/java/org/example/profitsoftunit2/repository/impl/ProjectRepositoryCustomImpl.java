@@ -8,7 +8,7 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
+import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.repository.ProjectRepositoryCustom;
 import org.example.profitsoftunit2.service.strategy.FilterStrategy;
@@ -25,7 +25,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 
 	//TODO refactor methods
 	@Override
-	public List<Project> findWithFiltrationAndPagination(ProjectSearchDto searchDto) {
+	public List<Project> findWithFiltrationAndPagination(ProjectsSearchDto searchDto) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
 		Root<Project> project = cq.from(Project.class);
@@ -38,7 +38,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 	}
 
 	@Override
-	public List<Project> findWithFiltration(ProjectSearchDto searchDto) {
+	public List<Project> findWithFiltration(ProjectsSearchDto searchDto) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
 		Root<Project> project = cq.from(Project.class);
@@ -56,7 +56,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 		return typedQuery;
 	}
 
-	private List<Predicate> createPredicates(CriteriaBuilder cb, Root<Project> project, ProjectSearchDto searchDto) {
+	private List<Predicate> createPredicates(CriteriaBuilder cb, Root<Project> project, ProjectsSearchDto searchDto) {
 		List<Predicate> predicates = new ArrayList<>();
 		for (FilterStrategy strategy : createFilterStrategyList(searchDto)) {
 			Predicate predicate = strategy.createPredicate(project, cb);
@@ -66,7 +66,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 		return predicates;
 	}
 
-	private List<FilterStrategy> createFilterStrategyList(ProjectSearchDto searchDto) {
+	private List<FilterStrategy> createFilterStrategyList(ProjectsSearchDto searchDto) {
 		List<FilterStrategy> predicates = new ArrayList<>();
 
 		predicates.add((root, cb) -> equalPredicate(cb, root.get("name"), searchDto.getProjectName()));

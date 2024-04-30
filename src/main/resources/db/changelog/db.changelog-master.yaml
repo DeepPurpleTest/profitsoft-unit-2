@@ -16,3 +16,5 @@ databaseChangeLog:
       file: db/changelog/dataset/project-dataset.xml
   - include:
       file: db/changelog/dataset/project-member-dataset.xml
+  - include:
+      file: db/changelog/dataset/task-dataset.xml

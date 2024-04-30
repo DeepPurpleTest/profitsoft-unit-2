@@ -31,6 +31,8 @@ public class Member {
 
 	private String name;
 
+	private String email;
+
 	@ManyToMany(mappedBy = "members")
 	@ToString.Exclude
 	private Set<Project> projects = new HashSet<>();

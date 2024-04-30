@@ -11,6 +11,8 @@ public interface MemberService {
 
 	Optional<Member> findById(Long id);
 
+	Optional<Member> findByIdAndProjectId(Long id, Long projectId);
+
 	void createMember(MemberDto memberDto);
 
 	List<MemberDto> findAll();
@@ -21,7 +23,7 @@ public interface MemberService {
 
 	boolean existsById(Long id);
 
-	Long deleteById(Long id);
+	void deleteById(Long id);
 
-	void updateMemberById(MemberDto memberDto, Long id);
+	MemberDto updateMemberById(MemberDto memberDto, Long id);
 }

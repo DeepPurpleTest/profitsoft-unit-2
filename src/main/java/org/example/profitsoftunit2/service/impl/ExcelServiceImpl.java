@@ -22,7 +22,6 @@ import static java.util.stream.Collectors.joining;
 import static org.example.profitsoftunit2.util.ReflectionUtils.getFieldValueByName;
 import static org.example.profitsoftunit2.util.ReflectionUtils.getNames;
 import static org.example.profitsoftunit2.util.ReflectionUtils.getObjectFields;
-import static org.example.profitsoftunit2.util.ReflectionUtils.isTypeCollection;
 
 @Slf4j
 @Service
@@ -84,6 +83,7 @@ public class ExcelServiceImpl implements ExcelService {
 				.map(object -> getFieldValueByName(object, "name"))
 				.filter(Objects::nonNull)
 				.map(Object::toString)
+				.sorted()
 				.collect(joining(", "));
 	}
 }

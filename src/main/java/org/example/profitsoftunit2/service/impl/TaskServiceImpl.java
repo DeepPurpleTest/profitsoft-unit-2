@@ -54,31 +54,68 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
-	public Long deleteById(Long id) {
+	public void deleteById(Long id) {
 		if (!taskRepository.existsById(id)) {
 			throw new EntityNotFoundException(String.format("Task with id:%d is not found", id));
 		}
 
 		taskRepository.deleteById(id);
-		return id;
 	}
 
 	//TODO all field requested and need to check if the are relevant
 	@Override
-	public void updateTaskById(TaskDto taskDto, Long id) {
+	@Transactional
+	public TaskDto updateTaskById(TaskDto taskDto, Long id) {
+		Optional<Task> byId = taskRepository.findById(id);
+
+		if (byId.isEmpty()) {
+			throw new EntityNotFoundException(String.format("Task with id: %d not found", id));
+		}
+
+		Task task = updateFields(taskDto, byId.get());
+		setUpTask(task);
+		Task updatedTask = taskRepository.save(task);
+		return taskMapper.toDto(updatedTask);
 	}
+
+	private Task updateFields(TaskDto taskDto, Task task) {
+		Task taskToUpdate = new Task();
+		taskToUpdate.setId(task.getId());
+		taskToUpdate.setName(taskDto.getName() == null ? task.getName() : taskDto.getName());
+		taskToUpdate.setDescription(taskDto.getDescription() == null ?
+				task.getDescription() : taskDto.getDescription());
+		taskToUpdate.setProject(task.getProject());
+		taskToUpdate.setAssignee(Member.builder().id(taskDto.getAssigneeId()).build());
+		taskToUpdate.setReporter(taskDto.getReporterId() == null ?
+				task.getReporter() : Member.builder().id(taskDto.getReporterId()).build());
+
+		return taskToUpdate;
+	}
+
 
 	//TODO check members in current project
 	private void setUpTask(Task task) {
 		Optional<Project> byId = projectService.findById(task.getProject().getId());
-		Optional<Member> reporterById = memberService.findById(task.getReporter().getId());
-		Optional<Member> assigneeById = Optional.ofNullable(task.getAssignee().getId())
-				.flatMap(memberService::findById);
-
-		task.setAssignee(assigneeById.orElse(null));
 		task.setProject(byId.orElseThrow(() -> new EntityNotFoundException(
-				String.format("Project with id: %d", task.getProject().getId()))));
+				String.format("Project with id:%d not found", task.getProject().getId()))));
+
+		Optional<Member> reporterById = memberService.findByIdAndProjectId(task.getReporter().getId(),
+				task.getProject().getId());
 		task.setReporter(reporterById.orElseThrow(() -> new EntityNotFoundException(
-				String.format("Member reporter with id: %d", task.getProject().getId()))));
+				String.format("Member reporter with id:%d not found", task.getReporter().getId()))));
+
+
+		Member assignee = getAssigneeMember(task.getAssignee().getId(), task.getProject().getId());
+		task.setAssignee(assignee);
+	}
+
+	private Member getAssigneeMember(Long assigneeId, Long projectId) {
+		if(assigneeId == null) {
+			return null;
+		}
+
+		Optional<Member> memberByIdAndProjectId = memberService.findByIdAndProjectId(assigneeId, projectId);
+		return memberByIdAndProjectId.orElseThrow(() -> new EntityNotFoundException(
+				String.format("Member assignee with id:%d not found", assigneeId)));
 	}
 }

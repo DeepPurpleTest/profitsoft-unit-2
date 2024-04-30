@@ -7,15 +7,19 @@
 	<changeSet id="member dataset" author="Moksem">
 		<insert tableName="member">
 			<column name="name" value="Moksem"/>
+			<column name="email" value="moksem@gmail.com"/>
 		</insert>
 		<insert tableName="member">
 			<column name="name" value="Vodem"/>
+			<column name="email" value="vodem@gmail.com"/>
 		</insert>
 		<insert tableName="member">
 			<column name="name" value="Denchik"/>
+			<column name="email" value="denchik@gmail.com"/>
 		</insert>
 		<insert tableName="member">
 			<column name="name" value="Maus"/>
+			<column name="email" value="maus@gmail.com"/>
 		</insert>
 		<rollback>
 			DELETE FROM member;

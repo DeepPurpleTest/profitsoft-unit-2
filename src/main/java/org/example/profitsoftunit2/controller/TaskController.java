@@ -45,17 +45,18 @@ public class TaskController {
 
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void updateTask(@PathVariable("id") Long id, @RequestBody @Valid TaskDto taskDto,
+	public TaskDto updateTask(@PathVariable("id") Long id, @RequestBody @Valid TaskDto taskDto,
 						   BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect Task data", bindingResult);
 		}
 
-		taskService.updateTaskById(taskDto, id);
+		return taskService.updateTaskById(taskDto, id);
 	}
 
 	@DeleteMapping("/{id}")
-	public Long deleteTask(@PathVariable("id") Long id) {
-		return  taskService.deleteById(id);
+	@ResponseStatus(HttpStatus.OK)
+	public void deleteTask(@PathVariable("id") Long id) {
+		taskService.deleteById(id);
 	}
 }

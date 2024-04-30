@@ -1,20 +1,17 @@
 package org.example.profitsoftunit2.service.impl;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
+import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.mapper.MemberMapper;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.entity.Member;
-import org.example.profitsoftunit2.model.entity.Project;
-import org.example.profitsoftunit2.model.entity.Task;
 import org.example.profitsoftunit2.repository.MemberRepository;
 import org.example.profitsoftunit2.service.MemberService;
-import org.example.profitsoftunit2.service.ProjectService;
-import org.example.profitsoftunit2.service.TaskService;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,9 +30,19 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	public Optional<Member> findByIdAndProjectId(Long id, Long projectId) {
+		return memberRepository.findByIdAndProjectId(id, projectId);
+	}
+
+	@Override
 	public void createMember(MemberDto memberDto) {
 		Member member = memberMapper.toEntity(memberDto);
-		memberRepository.save(member);
+		try {
+			memberRepository.save(member);
+		} catch (ConstraintViolationException ex) {
+			log.warn("Email {} already exist", member.getEmail());
+			throw new EntityValidationException(ex.getMessage());
+		}
 	}
 
 	@Override
@@ -59,18 +66,17 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Long deleteById(Long id) {
+	public void deleteById(Long id) {
 		if (!memberRepository.existsById(id)) {
 			throw new EntityNotFoundException(String.format("Member with id:%d is not found", id));
 		}
 
 		memberRepository.deleteById(id);
-		return id;
 	}
 
 	//TODO all field requested and need to check if the are relevant
 	@Override
-	public void updateMemberById(MemberDto memberDto, Long id) {
+	public MemberDto updateMemberById(MemberDto memberDto, Long id) {
 		Optional<Member> byId = memberRepository.findById(id);
 
 		if (byId.isEmpty()) {
@@ -78,13 +84,20 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		Member member = updateFields(memberDto, byId.get());
-		memberRepository.save(member);
+		try {
+			Member updatedMember = memberRepository.save(member);
+			return memberMapper.toDto(updatedMember);
+		} catch (ConstraintViolationException ex) {
+			log.warn("Email {} already exist", member.getEmail());
+			throw new EntityValidationException(ex.getMessage());
+		}
 	}
 
 	private Member updateFields(MemberDto memberUpdate, Member member) {
 		Member memberToUpdate = new Member();
 		memberToUpdate.setId(member.getId());
 		memberToUpdate.setName(memberUpdate.getName() == null ? member.getName() : memberUpdate.getName());
+		memberToUpdate.setEmail(memberUpdate.getEmail() == null ? member.getEmail() : memberUpdate.getEmail());
 		memberToUpdate.setProjects(member.getProjects());
 		memberToUpdate.setAssignedTasks(member.getAssignedTasks());
 		memberToUpdate.setAssignedTasks(member.getCreatedTasks());

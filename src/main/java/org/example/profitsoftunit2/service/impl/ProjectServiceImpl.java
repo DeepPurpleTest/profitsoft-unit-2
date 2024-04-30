@@ -8,7 +8,9 @@ import org.example.profitsoftunit2.mapper.ProjectMapper;
 import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
-import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
+import org.example.profitsoftunit2.model.dto.ProjectsResponseDto;
+import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
+import org.example.profitsoftunit2.model.dto.SimpleProjectDto;
 import org.example.profitsoftunit2.model.entity.Member;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.processor.FileProcessor;
@@ -58,9 +60,9 @@ public class ProjectServiceImpl implements ProjectService {
 		return projectRepository.findById(id);
 	}
 
-	//TODO all field requested and need to check if the are relevant
+	//TODO all field requested and need to check if they are relevant
 	@Override
-	public void updateProjectById(ProjectDto projectDto, Long id) {
+	public ProjectDto updateProjectById(ProjectDto projectDto, Long id) {
 		Optional<Project> byId = projectRepository.findById(id);
 
 		if (byId.isEmpty()) {
@@ -68,7 +70,8 @@ public class ProjectServiceImpl implements ProjectService {
 		}
 
 		Project project = updateFields(projectDto, byId.get());
-		projectRepository.save(project);
+		Project updatedProject = projectRepository.save(project);
+		return projectMapper.toDto(updatedProject);
 	}
 
 	@Override
@@ -93,25 +96,34 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public Long deleteProjectById(Long id) {
+	public void deleteProjectById(Long id) {
 		if (!projectRepository.existsById(id)) {
 			throw new EntityNotFoundException(String.format("Project with id:%d is not found", id));
 		}
 
 		projectRepository.deleteById(id);
-		return id;
 	}
 
 	//TODO not all project fields
 	@Override
-	public List<ProjectDto> findAllWithPagination(ProjectSearchDto searchDto) {
+	public ProjectsResponseDto findAllWithPagination(ProjectsSearchDto searchDto) {
 		List<Project> projects = projectRepository.findWithFiltrationAndPagination(searchDto);
+		List<SimpleProjectDto> projectsDtos = projectMapper.mapAllToSimpleDto(projects);
+		long count = projectRepository.count();
 
-		return projectMapper.mapAllToDto(projects);
+		int totalPages = totalPagesCount(count, searchDto.getPageSize());
+		return ProjectsResponseDto.builder()
+				.projects(projectsDtos)
+				.totalPages(totalPages)
+				.build();
+	}
+
+	private int totalPagesCount(long totalElements, int pageSize) {
+		return (int) Math.ceil((double) totalElements / pageSize);
 	}
 
 	@Override
-	public List<ProjectDto> findAll(ProjectSearchDto searchDto) {
+	public List<ProjectDto> findAll(ProjectsSearchDto searchDto) {
 		return projectMapper.mapAllToDto(projectRepository.findWithFiltration(searchDto));
 	}
 

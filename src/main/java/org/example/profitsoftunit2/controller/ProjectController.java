@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.model.dto.ImportDto;
-import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
-import org.example.profitsoftunit2.model.dto.ProjectSearchDto;
+import org.example.profitsoftunit2.model.dto.ProjectsResponseDto;
+import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
 import org.example.profitsoftunit2.service.ExcelService;
 import org.example.profitsoftunit2.service.ProjectService;
 import org.springframework.http.HttpHeaders;
@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,31 +57,30 @@ public class ProjectController {
 
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void updateProject(@PathVariable("id") Long id, @RequestBody @Valid ProjectDto projectDto,
+	public ProjectDto updateProject(@PathVariable("id") Long id, @RequestBody @Valid ProjectDto projectDto,
 									BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect Project data", bindingResult);
 		}
 
-		projectService.updateProjectById(projectDto, id);
+		return projectService.updateProjectById(projectDto, id);
 	}
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public Long deleteProject(@PathVariable("id") Long id) {
-		return projectService.deleteProjectById(id);
+	public void deleteProject(@PathVariable("id") Long id) {
+		projectService.deleteProjectById(id);
 	}
 
 	@PostMapping("/_list")
-	public List<ProjectDto> findAll(@RequestBody @Valid ProjectSearchDto projectSearchDto,
-									BindingResult bindingResult) {
+	@ResponseStatus(HttpStatus.OK)
+	public ProjectsResponseDto findAll(@RequestBody @Valid ProjectsSearchDto projectsSearchDto,
+									   BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		List<ProjectDto> projects = projectService.findAllWithPagination(projectSearchDto);
-		log.info("size of projects {}", projects.size());
-		return projects;
+		return projectService.findAllWithPagination(projectsSearchDto);
 	}
 
 	@PostMapping("/upload")
@@ -91,21 +89,25 @@ public class ProjectController {
 		return projectService.uploadDataFromFileToDb(file);
 	}
 
-	@PostMapping(value = "_report", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@PostMapping(value = "/_report", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<byte[]> generateReport(@RequestBody @Valid ProjectSearchDto projectSearchDto,
+	public ResponseEntity<byte[]> generateReport(@RequestBody @Valid ProjectsSearchDto projectsSearchDto,
 												   BindingResult bindingResult) throws IllegalAccessException, IOException {
 		if(bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		List<Object> objects = new ArrayList<>(projectService.findAll(projectSearchDto));
+		log.info("projectService.findAll(projectsSearchDto)");
+		List<Object> objects = new ArrayList<>(projectService.findAll(projectsSearchDto));
+
+		log.info("excelService.generateFile(objects, ProjectDto.class, Projects)");
 		byte[] fileContent = excelService.generateFile(objects, ProjectDto.class, "Projects");
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 		headers.setContentDispositionFormData("attachment", "projects.xlsx");
 
+		log.info("return new ResponseEntity<>(fileContent, headers, HttpStatus.OK)");
 		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
 	}
 }

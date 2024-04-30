@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.model.dto.MemberDto;
-import org.example.profitsoftunit2.model.dto.ProjectDto;
 import org.example.profitsoftunit2.service.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -50,17 +49,18 @@ public class MemberController {
 	}
 
 	@PutMapping("/{id}")
-	public void updateProject(@PathVariable("id") Long id, @RequestBody @Valid MemberDto memberDto,
-									BindingResult bindingResult) {
+	public MemberDto updateMember(@PathVariable("id") Long id, @RequestBody @Valid MemberDto memberDto,
+								  BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect Member data", bindingResult);
 		}
 
-		memberService.updateMemberById(memberDto, id);
+		return memberService.updateMemberById(memberDto, id);
 	}
 
 	@DeleteMapping("/{id}")
-	public Long deleteMember(@PathVariable("id") Long id) {
-		return memberService.deleteById(id);
+	@ResponseStatus(HttpStatus.OK)
+	public void deleteMember(@PathVariable("id") Long id) {
+		memberService.deleteById(id);
 	}
 }

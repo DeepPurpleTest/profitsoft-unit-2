@@ -2,5 +2,3 @@ spring:
   datasource:
     url: jdbc:tc:postgresql:15-alpine:///integration-tests-db
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-  liquibase:
-    test-rollback-on-update: 

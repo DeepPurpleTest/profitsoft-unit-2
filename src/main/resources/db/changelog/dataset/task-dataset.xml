@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+	<changeSet id="task dataset" author="Moksem">
+		<insert tableName="task">
+			<column name="name" value="Project 1 Task 1"/>
+			<column name="description" value="Project 1 Task 1"/>
+			<column name="member_reporter_id" value="1"/>
+			<column name="member_assignee_id" value="2"/>
+			<column name="project_id" value="1"/>
+		</insert>
+		<insert tableName="task">
+			<column name="name" value="Project 2 Task 1"/>
+			<column name="description" value="Project 2 Task 1"/>
+			<column name="member_reporter_id" value="3"/>
+			<column name="member_assignee_id" value="4"/>
+			<column name="project_id" value="2"/>
+		</insert>
+		<rollback>
+			DELETE FROM task;
+		</rollback>
+	</changeSet>
+</databaseChangeLog>
