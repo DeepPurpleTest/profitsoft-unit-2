@@ -1,4 +1,4 @@
-package org.example.profitsoftunit2.util.wrapper;
+package org.example.profitsoftunit2.exception.wrapper;
 
 import org.example.profitsoftunit2.exception.EntityException;
 import org.example.profitsoftunit2.exception.error.ApiError;

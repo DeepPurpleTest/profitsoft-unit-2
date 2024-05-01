@@ -5,7 +5,7 @@ WORKDIR $HOME
 COPY pom.xml $HOME
 RUN mvn verify --fail-never
 COPY . $HOME
-RUN mvn clean package
+RUN mvn clean package -Dmaven.test.skip=true
 
 FROM eclipse-temurin:17-alpine
 

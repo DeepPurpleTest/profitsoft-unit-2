@@ -5,7 +5,7 @@ import org.example.profitsoftunit2.exception.EntityException;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
 import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.exception.error.ApiError;
-import org.example.profitsoftunit2.util.wrapper.ExceptionWrapper;
+import org.example.profitsoftunit2.exception.wrapper.ExceptionWrapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

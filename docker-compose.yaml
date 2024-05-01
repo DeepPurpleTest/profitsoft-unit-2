@@ -7,12 +7,11 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - ${EXTERNAL_DB_PORT}:5432
     environment:
-#      TODO in variables
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: profitsoft-unit-2
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
       interval: 8s
@@ -21,18 +20,25 @@ services:
     networks:
       - unit-2
 
-#  backend:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    container_name: unit-2-backend
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#    networks:
-#      - unit-2
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: unit-2-backend
+    environment:
+      - APP_PORT=${APP_PORT}
+      - EXTERNAL_DB_PORT=${EXTERNAL_DB_PORT}
+      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - unit-2
 
 volumes:
   pg_data:
