@@ -1,6 +1,5 @@
 package org.example.profitsoftunit2.service.impl;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
@@ -10,6 +9,7 @@ import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.entity.Member;
 import org.example.profitsoftunit2.repository.MemberRepository;
 import org.example.profitsoftunit2.service.MemberService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,11 +25,6 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberMapper memberMapper;
 
 	@Override
-	public Optional<Member> findById(Long id) {
-		return memberRepository.findById(id);
-	}
-
-	@Override
 	public Optional<Member> findByIdAndProjectId(Long id, Long projectId) {
 		return memberRepository.findByIdAndProjectId(id, projectId);
 	}
@@ -39,9 +34,10 @@ public class MemberServiceImpl implements MemberService {
 		Member member = memberMapper.toEntity(memberDto);
 		try {
 			memberRepository.save(member);
-		} catch (ConstraintViolationException ex) {
-			log.warn("Email {} already exist", member.getEmail());
-			throw new EntityValidationException(ex.getMessage());
+		} catch (DataIntegrityViolationException ex) {
+			log.warn("Database integrity has been compromised");
+//			if(ex.getCause() instanceof ConstraintViolationException) //TODO maybe use?
+			throw new EntityValidationException("Email already exist", ex);
 		}
 	}
 
@@ -51,18 +47,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public List<MemberDto> findAllByProjectId(Long id) {
-		return memberMapper.mapAllToDto(memberRepository.findByProjectId(id));
-	}
-
-	@Override
 	public List<Member> findAllByIds(Set<Long> ids) {
 		return memberRepository.findAllById(ids);
-	}
-
-	@Override
-	public boolean existsById(Long id) {
-		return memberRepository.existsById(id);
 	}
 
 	@Override
@@ -87,9 +73,8 @@ public class MemberServiceImpl implements MemberService {
 		try {
 			Member updatedMember = memberRepository.save(member);
 			return memberMapper.toDto(updatedMember);
-		} catch (ConstraintViolationException ex) {
-			log.warn("Email {} already exist", member.getEmail());
-			throw new EntityValidationException(ex.getMessage());
+		} catch (DataIntegrityViolationException ex) {
+			throw new EntityValidationException("Email already exist", ex);
 		}
 	}
 

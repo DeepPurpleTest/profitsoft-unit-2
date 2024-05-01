@@ -12,6 +12,10 @@ public class EntityValidationException extends EntityException {
 		this.bindingResult = bindingResult;
 	}
 
+	public EntityValidationException(String message, Exception e) {
+		super(message, e);
+	}
+
 	public EntityValidationException(String message) {
 		super(message);
 	}

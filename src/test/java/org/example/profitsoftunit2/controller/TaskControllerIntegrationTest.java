@@ -39,7 +39,7 @@ class TaskControllerIntegrationTest {
 
 	@Test
 	void findAll_shouldReturnList() throws Exception {
-		MvcResult result = mockMvc.perform(get("/api/task"))
+		MvcResult result = mockMvc.perform(get("/api/tasks"))
 				.andExpect(status().isOk())
 				.andReturn();
 
@@ -60,7 +60,7 @@ class TaskControllerIntegrationTest {
 				.reporterId(1L)
 				.build();
 
-		mockMvc.perform(post("/api/task")
+		mockMvc.perform(post("/api/tasks")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(taskDto))
 						.accept(MediaType.APPLICATION_JSON)
@@ -76,11 +76,12 @@ class TaskControllerIntegrationTest {
 				.id(1L)
 				.name("Project 1 Task 1 updated")
 				.description("Project 1 Task 1 updated")
+				.projectId(1L)
 				.assigneeId(1L)
 				.reporterId(2L)
 				.build();
 
-		MvcResult result = mockMvc.perform(put("/api/task/" + taskDto.getId())
+		MvcResult result = mockMvc.perform(put("/api/tasks/" + taskDto.getId())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(taskDto))
 						.accept(MediaType.APPLICATION_JSON)
@@ -115,7 +116,7 @@ class TaskControllerIntegrationTest {
 				.assigneeId(3L)
 				.build();
 
-		mockMvc.perform(put("/api/task/" + taskDto.getId())
+		mockMvc.perform(put("/api/tasks/" + taskDto.getId())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(taskDto))
 						.accept(MediaType.APPLICATION_JSON)
@@ -135,7 +136,7 @@ class TaskControllerIntegrationTest {
 				.assigneeId(1L)
 				.build();
 
-		mockMvc.perform(put("/api/task/" + taskDto.getId())
+		mockMvc.perform(put("/api/tasks/" + taskDto.getId())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(taskDto))
 						.accept(MediaType.APPLICATION_JSON)
@@ -151,10 +152,11 @@ class TaskControllerIntegrationTest {
 				.id(1L)
 				.name("Project 1 Task 1 updated")
 				.description("Project 1 Task 1 updated")
+				.projectId(1L)
 				.reporterId(2L)
 				.build();
 
-		MvcResult result = mockMvc.perform(put("/api/task/" + taskDto.getId())
+		MvcResult result = mockMvc.perform(put("/api/tasks/" + taskDto.getId())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(taskDto))
 						.accept(MediaType.APPLICATION_JSON)
@@ -182,7 +184,7 @@ class TaskControllerIntegrationTest {
 	void deleteTask_withValidId_shouldReturnStatusOk() throws Exception {
 		long id = 1L;
 
-		mockMvc.perform(delete("/api/task/" + id))
+		mockMvc.perform(delete("/api/tasks/" + id))
 				.andExpect(status().isOk())
 				.andReturn();
 	}

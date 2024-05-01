@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.example.profitsoftunit2.model.dto.ImportDto;
+import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
 import org.example.profitsoftunit2.model.dto.ProjectsResponseDto;
 import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
@@ -54,6 +55,7 @@ class ProjectControllerIntegrationTest {
 	private WebApplicationContext webApplicationContext;
 
 	@Test
+	// Used to roll back changes to the database
 	@Transactional
 	void createProject_withValidBody_shouldReturnCreatedAndStatusCreated() throws Exception {
 		ProjectDto body = ProjectDto.builder()
@@ -61,7 +63,7 @@ class ProjectControllerIntegrationTest {
 				.description("Test description")
 				.build();
 
-		mockMvc.perform(post("/api/project")
+		mockMvc.perform(post("/api/projects")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(body))
 						.accept(MediaType.APPLICATION_JSON)
@@ -73,7 +75,7 @@ class ProjectControllerIntegrationTest {
 	@Test
 	void findProject_withValidId_shouldReturnDtoAndStatusOk() throws Exception {
 		Long id = 1L;
-		MvcResult result = mockMvc.perform(get("/api/project/" + id))
+		MvcResult result = mockMvc.perform(get("/api/projects/" + id))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("id").exists())
 				.andExpect(jsonPath("name").exists())
@@ -94,9 +96,10 @@ class ProjectControllerIntegrationTest {
 				.id(1L)
 				.name("New test name")
 				.description("New test description")
+				.members(List.of(MemberDto.builder().id(1L).build(), MemberDto.builder().id(2L).build(), MemberDto.builder().id(3L).build()))
 				.build();
 
-		MvcResult result = mockMvc.perform(put("/api/project/" + body.getId())
+		MvcResult result = mockMvc.perform(put("/api/projects/" + body.getId())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(body))
 						.accept(MediaType.APPLICATION_JSON)
@@ -110,6 +113,26 @@ class ProjectControllerIntegrationTest {
 		assertEquals(body.getId(), updatedProject.getId());
 		assertEquals(body.getName(), updatedProject.getName());
 		assertEquals(body.getDescription(), updatedProject.getDescription());
+		assertEquals(body.getMembers().size(), updatedProject.getMembers().size());
+	}
+
+	@Test
+	@Transactional
+	void updateProject_withInvalidBody_shouldReturnBadRequest() throws Exception {
+		ProjectDto body = ProjectDto.builder()
+				.id(1L)
+				.name("New test name")
+				.description("New test description")
+				.members(List.of(MemberDto.builder().id(1L).build(), MemberDto.builder().id(2L).build(), MemberDto.builder().id(6L).build()))
+				.build();
+
+		mockMvc.perform(put("/api/projects/" + body.getId())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(body))
+						.accept(MediaType.APPLICATION_JSON)
+						.characterEncoding("utf-8"))
+				.andExpect(status().isBadRequest())
+				.andReturn();
 	}
 
 	@Test
@@ -117,7 +140,7 @@ class ProjectControllerIntegrationTest {
 	void deleteProjectById_withValidId_shouldReturnStatusOk() throws Exception {
 		long id = 1L;
 
-		mockMvc.perform(delete("/api/project/" + id))
+		mockMvc.perform(delete("/api/projects/" + id))
 				.andExpect(status().isOk());
 	}
 
@@ -131,7 +154,7 @@ class ProjectControllerIntegrationTest {
 				.pageSize(5)
 				.build();
 
-		MvcResult result = mockMvc.perform(post("/api/project/_list")
+		MvcResult result = mockMvc.perform(post("/api/projects/_list")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(body))
 						.accept(MediaType.APPLICATION_JSON)
@@ -159,7 +182,7 @@ class ProjectControllerIntegrationTest {
 				MediaType.APPLICATION_JSON_VALUE, resource.getInputStream());
 
 		MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-		MvcResult result = mockMvc.perform(multipart("/api/project/upload")
+		MvcResult result = mockMvc.perform(multipart("/api/projects/upload")
 						.file(file))
 				.andExpect(status().isOk())
 				.andReturn();
@@ -176,7 +199,7 @@ class ProjectControllerIntegrationTest {
 		ProjectsSearchDto body = ProjectsSearchDto.builder()
 				.build();
 
-		MvcResult result = mockMvc.perform(post("/api/project/_report")
+		MvcResult result = mockMvc.perform(post("/api/projects/_report")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(body))
 						.accept(MediaType.APPLICATION_OCTET_STREAM_VALUE)

@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
+import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.mapper.TaskMapper;
 import org.example.profitsoftunit2.model.dto.TaskDto;
 import org.example.profitsoftunit2.model.entity.Member;
@@ -29,11 +30,6 @@ public class TaskServiceImpl implements TaskService {
 	private final TaskMapper taskMapper;
 
 	@Override
-	public Optional<Task> findById(Long id) {
-		return taskRepository.findById(id);
-	}
-
-	@Override
 	@Transactional
 	public void createTask(TaskDto taskDto) {
 		Task task = taskMapper.toEntity(taskDto);
@@ -46,11 +42,6 @@ public class TaskServiceImpl implements TaskService {
 	@Override
 	public List<TaskDto> findAll() {
 		return taskMapper.mapAllToDto(taskRepository.findAll());
-	}
-
-	@Override
-	public List<Task> findAllByIdList(List<Long> ids) {
-		return taskRepository.findAllById(ids);
 	}
 
 	@Override
@@ -96,12 +87,12 @@ public class TaskServiceImpl implements TaskService {
 	//TODO check members in current project
 	private void setUpTask(Task task) {
 		Optional<Project> byId = projectService.findById(task.getProject().getId());
-		task.setProject(byId.orElseThrow(() -> new EntityNotFoundException(
+		task.setProject(byId.orElseThrow(() -> new EntityValidationException(
 				String.format("Project with id:%d not found", task.getProject().getId()))));
 
 		Optional<Member> reporterById = memberService.findByIdAndProjectId(task.getReporter().getId(),
 				task.getProject().getId());
-		task.setReporter(reporterById.orElseThrow(() -> new EntityNotFoundException(
+		task.setReporter(reporterById.orElseThrow(() -> new EntityValidationException(
 				String.format("Member reporter with id:%d not found", task.getReporter().getId()))));
 
 
@@ -115,7 +106,7 @@ public class TaskServiceImpl implements TaskService {
 		}
 
 		Optional<Member> memberByIdAndProjectId = memberService.findByIdAndProjectId(assigneeId, projectId);
-		return memberByIdAndProjectId.orElseThrow(() -> new EntityNotFoundException(
+		return memberByIdAndProjectId.orElseThrow(() -> new EntityValidationException(
 				String.format("Member assignee with id:%d not found", assigneeId)));
 	}
 }

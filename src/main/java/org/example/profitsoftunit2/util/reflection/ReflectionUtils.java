@@ -1,4 +1,4 @@
-package org.example.profitsoftunit2.util;
+package org.example.profitsoftunit2.util.reflection;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.experimental.UtilityClass;
@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,10 +38,6 @@ public class ReflectionUtils {
 		}
 
 		return annotation.value();
-	}
-
-	public static boolean isTypeCollection(Class<?> type) {
-		return Collection.class.isAssignableFrom(type);
 	}
 
 	public static Object getFieldValueByName(Object object, String fieldName) {

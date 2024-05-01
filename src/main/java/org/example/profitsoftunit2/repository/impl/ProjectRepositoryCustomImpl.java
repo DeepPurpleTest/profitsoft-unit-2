@@ -21,12 +21,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 
-	private final EntityManager em;
+	private final EntityManager entityManager;
 
 	//TODO refactor methods
 	@Override
 	public List<Project> findWithFiltrationAndPagination(ProjectsSearchDto searchDto) {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
 		Root<Project> project = cq.from(Project.class);
 
@@ -39,18 +39,18 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 
 	@Override
 	public List<Project> findWithFiltration(ProjectsSearchDto searchDto) {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
 		Root<Project> project = cq.from(Project.class);
 
 		List<Predicate> predicates = createPredicates(cb, project, searchDto);
 		cq.where(predicates.toArray(new Predicate[0]));
 
-		return em.createQuery(cq).getResultList();
+		return entityManager.createQuery(cq).getResultList();
 	}
 
 	private TypedQuery<Project> createPaginatedQuery(CriteriaQuery<Project> cq, int offset, int pageSize) {
-		TypedQuery<Project> typedQuery = em.createQuery(cq);
+		TypedQuery<Project> typedQuery = entityManager.createQuery(cq);
 		typedQuery.setFirstResult(offset);
 		typedQuery.setMaxResults(pageSize);
 		return typedQuery;
@@ -70,22 +70,14 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 		List<FilterStrategy> predicates = new ArrayList<>();
 
 		predicates.add((root, cb) -> equalPredicate(cb, root.get("name"), searchDto.getProjectName()));
-		predicates.add((root, cb) -> cb.and(memberIdsPredicate(root, searchDto.getMembersIds())));
-		predicates.add((root, cb) -> cb.and(memberNamesPredicate(root, searchDto.getMembersNames())));
+		predicates.add((root, cb) -> cb.and(createMemberPredicate(root, searchDto.getMembersIds(), "id")));
+		predicates.add((root, cb) -> cb.and(createMemberPredicate(root, searchDto.getMembersNames(), "name")));
 
 		return predicates;
 	}
 
 	private Predicate equalPredicate(CriteriaBuilder cb, Path<String> path, String value) {
 		return value != null ? cb.equal(path, value) : cb.conjunction();
-	}
-
-	private Predicate[] memberIdsPredicate(Root<Project> root, List<Long> memberIds) {
-		return createMemberPredicate(root, memberIds, "id");
-	}
-
-	private Predicate[] memberNamesPredicate(Root<Project> root, List<String> memberNames) {
-		return createMemberPredicate(root, memberNames, "name");
 	}
 
 	private Predicate[] createMemberPredicate(Root<Project> root, List<?> memberList, String attributeName) {

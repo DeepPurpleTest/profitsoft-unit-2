@@ -4,10 +4,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
+import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.mapper.ProjectMapper;
 import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
+import org.example.profitsoftunit2.model.dto.ProjectSaveDto;
 import org.example.profitsoftunit2.model.dto.ProjectsResponseDto;
 import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
 import org.example.profitsoftunit2.model.dto.SimpleProjectDto;
@@ -20,7 +22,7 @@ import org.example.profitsoftunit2.service.ProjectService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
 	private final ProjectMapper projectMapper;
 
 	@Override
-	public void createProject(ProjectDto projectDto) {
+	public void createProject(ProjectSaveDto projectDto) {
 		Project project = projectMapper.toEntity(projectDto);
 
 		projectRepository.save(project);
@@ -75,27 +77,6 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	@Transactional
-	public ProjectDto addMemberToProject(MemberDto memberDto, Long id) {
-		Optional<Project> projectById = projectRepository.findById(id);
-		if (projectById.isEmpty()) {
-			throw new EntityNotFoundException(String.format("Project with id: %d not found", memberDto.getId()));
-		}
-
-		Optional<Member> memberById = memberService.findById(memberDto.getId());
-		if (memberById.isEmpty()) {
-			throw new EntityNotFoundException(String.format("Member with id: %d not found", memberDto.getId()));
-		}
-
-		Project project = projectById.get();
-		Member member = memberById.get();
-		project.getMembers().add(member);
-		member.getProjects().add(project);
-
-		return projectMapper.toDto(project);
-	}
-
-	@Override
 	public void deleteProjectById(Long id) {
 		if (!projectRepository.existsById(id)) {
 			throw new EntityNotFoundException(String.format("Project with id:%d is not found", id));
@@ -128,22 +109,6 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public List<Project> findAllByIds(List<Long> ids) {
-		List<Project> existingProjects = projectRepository.findAllById(ids);
-		Set<Long> existingIds = existingProjects.stream()
-				.map(Project::getId)
-				.collect(Collectors.toSet());
-
-		if (existingIds.size() < ids.size()) {
-			List<Long> notFoundIds = new ArrayList<>(ids);
-			notFoundIds.removeAll(existingIds);
-			throw new EntityNotFoundException(String.format("Projects with ids %s are not found", notFoundIds));
-		}
-
-		return existingProjects;
-	}
-
-	@Override
 	@Transactional
 	public ImportDto uploadDataFromFileToDb(MultipartFile multipartFile) {
 		List<ProjectDto> dtoProjects = fileProcessor.extractDataFromFile(multipartFile);
@@ -151,6 +116,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 		List<Project> validProjects = projects.stream()
 				.filter(this::validateProject)
+				.filter(project -> validateMembers(project.getMembers()))
 				.map(this::addDataToProject)
 				.toList();
 		List<Project> savedProjects = projectRepository.saveAllAndFlush(validProjects);
@@ -178,11 +144,23 @@ public class ProjectServiceImpl implements ProjectService {
 			return false;
 		}
 
-		for (Member member : project.getMembers()) {
-			if (member.getId() == null || !memberService.existsById(member.getId())) {
-				log.warn("Invalid member id:{}", member.getId());
-				return false;
-			}
+		return true;
+	}
+
+	private boolean validateMembers(Set<Member> members) {
+		Set<Long> membersIds = members.stream()
+				.map(Member::getId)
+				.collect(Collectors.toSet());
+		List<Member> membersByIds = memberService.findAllByIds(membersIds);
+
+		if (membersByIds.size() != membersIds.size()) {
+			List<Long> notFoundMemberIds = membersIds.stream()
+					.filter(memberId -> membersByIds.stream()
+							.noneMatch(member -> member.getId().equals(memberId)))
+					.toList();
+
+			log.warn("Members with ids: {} not found", notFoundMemberIds);
+			return false;
 		}
 
 		return true;
@@ -194,9 +172,31 @@ public class ProjectServiceImpl implements ProjectService {
 		projectToUpdate.setName(projectDto.getName() == null ? project.getName() : projectDto.getName());
 		projectToUpdate.setDescription(projectDto.getDescription() == null ?
 				project.getDescription() : projectDto.getDescription());
-		projectToUpdate.setMembers(project.getMembers());
+
+		Set<Long> membersIds = Optional.ofNullable(projectDto.getMembers())
+				.orElse(Collections.emptyList())
+				.stream()
+				.map(MemberDto::getId)
+				.collect(Collectors.toSet());
+		projectToUpdate.setMembers(getMembers(membersIds));
 		projectToUpdate.setTasks(project.getTasks());
 
 		return projectToUpdate;
+	}
+
+	private Set<Member> getMembers(Set<Long> membersIds) {
+		List<Member> membersByIds = memberService.findAllByIds(membersIds);
+
+		if (membersByIds.size() != membersIds.size()) {
+			List<Long> notFoundMemberIds = membersIds.stream()
+					.filter(memberId -> membersByIds.stream()
+							.noneMatch(member -> member.getId().equals(memberId)))
+					.toList();
+
+			String errorMessage = "Invalid members ids: " + notFoundMemberIds;
+			throw new EntityValidationException(errorMessage);
+		}
+
+		return new HashSet<>(membersByIds);
 	}
 }

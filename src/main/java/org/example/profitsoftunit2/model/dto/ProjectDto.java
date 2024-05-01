@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ public class ProjectDto {
 	@NotEmpty(message = "Description is mandatory")
 	private String description;
 
-	private List<TaskDto> tasks;
+	private List<TaskDto> tasks = new ArrayList<>();
 
-	private List<MemberDto> members;
+	private List<MemberDto> members = new ArrayList<>();
 }

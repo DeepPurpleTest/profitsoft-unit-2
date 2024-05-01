@@ -7,28 +7,51 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
 import org.example.profitsoftunit2.model.entity.Project;
-import org.example.profitsoftunit2.service.ExcelService;
+import org.example.profitsoftunit2.service.FileGeneratorService;
+import org.example.profitsoftunit2.service.ProjectService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 import static java.util.stream.Collectors.joining;
-import static org.example.profitsoftunit2.util.ReflectionUtils.getFieldValueByName;
-import static org.example.profitsoftunit2.util.ReflectionUtils.getNames;
-import static org.example.profitsoftunit2.util.ReflectionUtils.getObjectFields;
+import static org.example.profitsoftunit2.util.reflection.ReflectionUtils.getFieldValueByName;
+import static org.example.profitsoftunit2.util.reflection.ReflectionUtils.getNames;
+import static org.example.profitsoftunit2.util.reflection.ReflectionUtils.getObjectFields;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExcelServiceImpl implements ExcelService {
+public class FileGeneratorServiceImpl implements FileGeneratorService {
 
-	public byte[] generateFile(List<Object> objects, Class<?> type, String sheetName) throws IllegalAccessException {
+	private final ProjectService projectService;
+
+	public ResponseEntity<byte[]> createExcelFileResponse(ProjectsSearchDto projectsSearchDto,
+														  Class<?> type,
+														  String sheetName) throws IllegalAccessException {
+		List<Object> objects = new ArrayList<>(projectService.findAll(projectsSearchDto));
+
+		byte[] fileContent = generateFile(objects, type, sheetName);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentDispositionFormData("attachment", "projects.xlsx");
+
+		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+	}
+
+	private byte[] generateFile(List<Object> objects, Class<?> type, String sheetName) throws IllegalAccessException {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet(sheetName);
 

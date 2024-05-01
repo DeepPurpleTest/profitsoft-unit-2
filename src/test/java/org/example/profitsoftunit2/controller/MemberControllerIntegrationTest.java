@@ -37,7 +37,7 @@ class MemberControllerIntegrationTest {
 
 	@Test
 	void findAll_shouldReturnList() throws Exception {
-		MvcResult result = mockMvc.perform(get("/api/member"))
+		MvcResult result = mockMvc.perform(get("/api/members"))
 				.andExpect(status().isOk())
 				.andReturn();
 
@@ -56,7 +56,7 @@ class MemberControllerIntegrationTest {
 				.email("test@gmail.com")
 				.build();
 
-		mockMvc.perform(post("/api/member")
+		mockMvc.perform(post("/api/members")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(memberDto))
 						.accept(MediaType.APPLICATION_JSON)
@@ -73,12 +73,12 @@ class MemberControllerIntegrationTest {
 				.email("moksem@gmail.com")
 				.build();
 
-		mockMvc.perform(post("/api/member")
+		mockMvc.perform(post("/api/members")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(memberDto))
 						.accept(MediaType.APPLICATION_JSON)
 						.characterEncoding("utf-8"))
-				.andExpect(status().isOk())
+				.andExpect(status().isBadRequest())
 				.andReturn();
 	}
 
@@ -91,7 +91,7 @@ class MemberControllerIntegrationTest {
 				.email("maksym@gmail.com")
 				.build();
 
-		MvcResult result = mockMvc.perform(put("/api/member/" + memberDto.getId())
+		MvcResult result = mockMvc.perform(put("/api/members/" + memberDto.getId())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(memberDto))
 						.accept(MediaType.APPLICATION_JSON)
@@ -116,7 +116,7 @@ class MemberControllerIntegrationTest {
 	void deleteMember_withValidId_shouldReturnStatusOk() throws Exception {
 		long id = 1L;
 
-		mockMvc.perform(delete("/api/member/" + id))
+		mockMvc.perform(delete("/api/members/" + id))
 				.andExpect(status().isOk())
 				.andReturn();
 	}

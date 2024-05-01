@@ -22,7 +22,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/api/members")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -41,11 +41,6 @@ public class MemberController {
 	@GetMapping()
 	public List<MemberDto> findAll() {
 		return memberService.findAll();
-	}
-
-	@GetMapping("/{id}")
-	public List<MemberDto> findAllMembersByProjectId(@PathVariable("id") Long id) {
-		return memberService.findAllByProjectId(id);
 	}
 
 	@PutMapping("/{id}")

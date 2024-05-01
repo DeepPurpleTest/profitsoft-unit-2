@@ -1,6 +1,7 @@
 package org.example.profitsoftunit2.mapper;
 
 import org.example.profitsoftunit2.model.dto.ProjectDto;
+import org.example.profitsoftunit2.model.dto.ProjectSaveDto;
 import org.example.profitsoftunit2.model.dto.SimpleProjectDto;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.mapstruct.IterableMapping;
@@ -20,13 +21,14 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 		uses = {MemberMapper.class, TaskMapper.class})
 public interface ProjectMapper {
 
-	@Named("simpleProjectMapper")
-	@Mapping(target = "members", ignore = true)
-	@Mapping(target = "tasks", ignore = true)
+	@Named("fullProjectMapper")
 	Project toEntity(ProjectDto projectDto);
 
-	@Named("fullProjectMapper")
-	Project toFullEntity(ProjectDto projectDto);
+	@Named("simpleProjectMapper")
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "members", ignore = true)
+	@Mapping(target = "tasks", ignore = true)
+	Project toEntity(ProjectSaveDto projectDto);
 
 	SimpleProjectDto toSimpleDto(Project project);
 

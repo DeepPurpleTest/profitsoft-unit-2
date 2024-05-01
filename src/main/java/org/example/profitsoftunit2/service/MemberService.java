@@ -9,19 +9,13 @@ import java.util.Set;
 
 public interface MemberService {
 
-	Optional<Member> findById(Long id);
-
 	Optional<Member> findByIdAndProjectId(Long id, Long projectId);
 
 	void createMember(MemberDto memberDto);
 
 	List<MemberDto> findAll();
 
-	List<MemberDto> findAllByProjectId(Long id);
-
 	List<Member> findAllByIds(Set<Long> ids);
-
-	boolean existsById(Long id);
 
 	void deleteById(Long id);
 

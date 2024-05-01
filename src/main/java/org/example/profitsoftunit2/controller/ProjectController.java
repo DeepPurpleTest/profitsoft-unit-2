@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
+import org.example.profitsoftunit2.model.dto.ProjectSaveDto;
 import org.example.profitsoftunit2.model.dto.ProjectsResponseDto;
 import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
-import org.example.profitsoftunit2.service.ExcelService;
+import org.example.profitsoftunit2.service.FileGeneratorService;
 import org.example.profitsoftunit2.service.ProjectService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,21 +28,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/project")
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
 	private final ProjectService projectService;
-	private final ExcelService excelService;
+	private final FileGeneratorService fileGeneratorService;
 
 	@PostMapping()
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createProject(@RequestBody @Valid ProjectDto projectDto, BindingResult bindingResult) {
+	public void createProject(@RequestBody @Valid ProjectSaveDto projectDto, BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect Project data", bindingResult);
 		}
@@ -97,17 +95,6 @@ public class ProjectController {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		log.info("projectService.findAll(projectsSearchDto)");
-		List<Object> objects = new ArrayList<>(projectService.findAll(projectsSearchDto));
-
-		log.info("excelService.generateFile(objects, ProjectDto.class, Projects)");
-		byte[] fileContent = excelService.generateFile(objects, ProjectDto.class, "Projects");
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-		headers.setContentDispositionFormData("attachment", "projects.xlsx");
-
-		log.info("return new ResponseEntity<>(fileContent, headers, HttpStatus.OK)");
-		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+		return fileGeneratorService.createExcelFileResponse(projectsSearchDto, ProjectDto.class, "Projects");
 	}
 }
