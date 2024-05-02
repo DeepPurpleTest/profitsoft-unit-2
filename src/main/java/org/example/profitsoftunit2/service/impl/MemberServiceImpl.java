@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
 import org.example.profitsoftunit2.exception.EntityValidationException;
+import org.example.profitsoftunit2.exception.UnknownApiException;
 import org.example.profitsoftunit2.mapper.MemberMapper;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.entity.Member;
 import org.example.profitsoftunit2.repository.MemberRepository;
 import org.example.profitsoftunit2.service.MemberService;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -32,13 +34,8 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public void createMember(MemberDto memberDto) {
 		Member member = memberMapper.toEntity(memberDto);
-		try {
-			memberRepository.save(member);
-		} catch (DataIntegrityViolationException ex) {
-			log.warn("Database integrity has been compromised");
-//			if(ex.getCause() instanceof ConstraintViolationException) //TODO maybe use?
-			throw new EntityValidationException("Email already exist", ex);
-		}
+
+		save(member);
 	}
 
 	@Override
@@ -69,12 +66,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		Member member = updateFields(memberDto, byId.get());
-		try {
-			Member updatedMember = memberRepository.save(member);
-			return memberMapper.toDto(updatedMember);
-		} catch (DataIntegrityViolationException ex) {
-			throw new EntityValidationException("Email already exist", ex);
-		}
+		return memberMapper.toDto(save(member));
 	}
 
 	private Member updateFields(MemberDto memberUpdate, Member member) {
@@ -87,5 +79,18 @@ public class MemberServiceImpl implements MemberService {
 		memberToUpdate.setAssignedTasks(member.getCreatedTasks());
 
 		return memberToUpdate;
+	}
+
+	private Member save(Member member) {
+		try {
+			return memberRepository.save(member);
+		} catch (DataIntegrityViolationException ex) {
+			log.warn("Database integrity has been compromised");
+			if(ex.getCause() instanceof ConstraintViolationException) {
+				throw new EntityValidationException("Email already exist");
+			}
+
+			throw new UnknownApiException("Db exception while saving");
+		}
 	}
 }
