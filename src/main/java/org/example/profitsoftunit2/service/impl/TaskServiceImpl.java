@@ -53,7 +53,6 @@ public class TaskServiceImpl implements TaskService {
 		taskRepository.deleteById(id);
 	}
 
-	//TODO all field requested and need to check if the are relevant
 	@Override
 	@Transactional
 	public TaskDto updateTaskById(TaskDto taskDto, Long id) {
@@ -84,7 +83,6 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 
-	//TODO check members in current project
 	private void setUpTask(Task task) {
 		Optional<Project> byId = projectService.findById(task.getProject().getId());
 		task.setProject(byId.orElseThrow(() -> new EntityValidationException(

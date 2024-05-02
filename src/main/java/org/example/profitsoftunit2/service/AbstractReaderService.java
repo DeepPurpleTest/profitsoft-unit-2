@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.profitsoftunit2.exception.FileValidationException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public abstract class AbstractReaderService<T> implements ReaderService<T> {
 		try (JsonParser jsonParser = objectMapper.getFactory().createParser(data)) {
 
 			if (jsonParser.nextToken() != JsonToken.START_ARRAY) {
-				throw new IllegalStateException("Expected content to be an array");
+				throw new FileValidationException("Expected content to be an array");
 			}
 
 			while (jsonParser.nextToken() != JsonToken.END_ARRAY) {

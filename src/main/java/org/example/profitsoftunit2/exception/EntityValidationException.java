@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.validation.BindingResult;
 
 @Getter
-public class EntityValidationException extends EntityException {
+public class EntityValidationException extends AppException {
 	private transient BindingResult bindingResult;
 
 	public EntityValidationException(String message, BindingResult bindingResult) {

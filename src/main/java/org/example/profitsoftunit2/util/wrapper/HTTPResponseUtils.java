@@ -2,7 +2,7 @@ package org.example.profitsoftunit2.util.wrapper;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import org.example.profitsoftunit2.exception.EntityException;
+import org.example.profitsoftunit2.exception.AppException;
 import org.example.profitsoftunit2.exception.error.ApiError;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -22,7 +22,7 @@ public class HTTPResponseUtils {
 	 * Method for building response with binding result
 	 */
 	public static ResponseEntity<Object> of(ApiError apiError,
-									 EntityException e, BindingResult bindingResult) {
+											AppException e, BindingResult bindingResult) {
 		Map<String, String> errors = new HashMap<>();
 		bindingResult.getAllErrors().forEach(error -> {
 			String fieldName = ((FieldError) error).getField();
@@ -37,7 +37,7 @@ public class HTTPResponseUtils {
 	}
 
 	public static ResponseEntity<Object> of(ApiError apiError,
-									 EntityException e) {
+									 AppException e) {
 		apiError.setMessage(e.getMessage());
 		apiError.setStackTrace(Arrays.toString(e.getStackTrace()));
 		return new ResponseEntity<>(apiError, apiError.getStatus());
