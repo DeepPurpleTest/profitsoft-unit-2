@@ -32,6 +32,7 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=db
+      - "spring.profiles.active=prod"
     ports:
       - ${APP_PORT}:${APP_PORT}
     depends_on:
