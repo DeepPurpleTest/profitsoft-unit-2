@@ -37,6 +37,7 @@ public class FileGeneratorServiceImpl implements FileGeneratorService {
 
 	private final ProjectService projectService;
 
+	@Override
 	public ResponseEntity<byte[]> createExcelFileResponse(ProjectsSearchDto projectsSearchDto,
 														  Class<?> type,
 														  String sheetName,
@@ -45,11 +46,16 @@ public class FileGeneratorServiceImpl implements FileGeneratorService {
 
 		byte[] fileContent = generateFile(objects, type, sheetName);
 
+		HttpHeaders headers = populateHeaders(fileName);
+
+		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+	}
+
+	private static HttpHeaders populateHeaders(String fileName) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 		headers.setContentDispositionFormData("attachment", fileName);
-
-		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+		return headers;
 	}
 
 	private byte[] generateFile(List<Object> objects, Class<?> type, String sheetName) throws IllegalAccessException {

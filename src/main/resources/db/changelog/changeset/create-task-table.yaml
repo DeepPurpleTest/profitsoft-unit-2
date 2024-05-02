@@ -39,7 +39,7 @@ databaseChangeLog:
                     foreignKeyName: task_member_assignee_fk
                     referencedTableName: member
                     referencedColumnNames: id
-                    nullable: false
+                    nullable: true
 
               - column:
                   name: member_reporter_id
@@ -48,7 +48,7 @@ databaseChangeLog:
                     foreignKeyName: task_member_reporter_fk
                     referencedTableName: member
                     referencedColumnNames: id
-                    nullable: false
+                    nullable: true
 
               - column:
                   name: project_id

@@ -1,5 +1,6 @@
 package org.example.profitsoftunit2.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.exception.EntityNotFoundException;
@@ -49,10 +50,17 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(Long id) {
-		if (!memberRepository.existsById(id)) {
+		Optional<Member> byId = memberRepository.findById(id);
+		if (byId.isEmpty()) {
 			throw new EntityNotFoundException(String.format("Member with id:%d is not found", id));
 		}
+
+		Member member = byId.get();
+		member.getProjects().forEach(project -> project.getMembers().remove(member));
+		member.getAssignedTasks().forEach(task -> task.setAssignee(null));
+		member.getCreatedTasks().forEach(task -> task.setReporter(null));
 
 		memberRepository.deleteById(id);
 	}

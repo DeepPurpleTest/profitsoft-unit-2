@@ -40,6 +40,8 @@ public class ProjectController {
 
 	private final ProjectService projectService;
 	private final FileGeneratorService fileGeneratorService;
+	private static final String SHEET_NAME = "Projects";
+	private static final String FILE_NAME = "projects.xlsx";
 
 	@PostMapping()
 	@ResponseStatus(HttpStatus.CREATED)
@@ -99,6 +101,6 @@ public class ProjectController {
 		}
 
 		return fileGeneratorService.createExcelFileResponse(projectsSearchDto,
-				ProjectDto.class, "Projects", "projects.xlsx");
+				ProjectDto.class, SHEET_NAME, FILE_NAME);
 	}
 }

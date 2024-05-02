@@ -40,7 +40,7 @@ public class Project {
 
 	private String description;
 
-	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
 	@ToString.Exclude
 	private Set<Task> tasks = new HashSet<>();
 

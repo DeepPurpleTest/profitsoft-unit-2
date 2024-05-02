@@ -33,11 +33,11 @@ public class Task {
 
 	private String description;
 
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "member_reporter_id", referencedColumnName = "id")
 	private Member reporter;
 
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "member_assignee_id", referencedColumnName = "id")
 	private Member assignee;
 

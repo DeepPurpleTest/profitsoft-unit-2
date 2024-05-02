@@ -33,12 +33,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 	 * */
 	@Override
 	public List<Project> findWithFiltrationAndPagination(ProjectsSearchDto searchDto) {
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
-		Root<Project> project = cq.from(Project.class);
-
-		List<Predicate> predicates = createPredicates(cb, project, searchDto);
-		cq.where(predicates.toArray(new Predicate[0]));
+		CriteriaQuery<Project> cq = buildQuery(searchDto);
 
 		TypedQuery<Project> typedQuery = createPaginatedQuery(cq, searchDto.getOffset(), searchDto.getPageSize());
 		return typedQuery.getResultList();
@@ -49,6 +44,12 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 	 */
 	@Override
 	public List<Project> findWithFiltration(ProjectsSearchDto searchDto) {
+		CriteriaQuery<Project> cq = buildQuery(searchDto);
+
+		return entityManager.createQuery(cq).getResultList();
+	}
+
+	private CriteriaQuery<Project> buildQuery(ProjectsSearchDto searchDto) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Project> cq = cb.createQuery(Project.class);
 		Root<Project> project = cq.from(Project.class);
@@ -56,7 +57,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 		List<Predicate> predicates = createPredicates(cb, project, searchDto);
 		cq.where(predicates.toArray(new Predicate[0]));
 
-		return entityManager.createQuery(cq).getResultList();
+		return cq;
 	}
 
 	private TypedQuery<Project> createPaginatedQuery(CriteriaQuery<Project> cq, int offset, int pageSize) {
@@ -90,13 +91,13 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 		return value != null ? cb.equal(path, value) : cb.conjunction();
 	}
 
-	private Predicate[] createMemberPredicate(Root<Project> root, List<?> memberList, String attributeName) {
-		if (memberList == null || memberList.isEmpty()) {
+	private Predicate[] createMemberPredicate(Root<Project> root, List<?> dataList, String attributeName) {
+		if (dataList == null || dataList.isEmpty()) {
 			return new Predicate[0];
 		}
 
 		List<Predicate> predicates = new ArrayList<>();
-		for (Object member : memberList) {
+		for (Object member : dataList) {
 			predicates.add(root.join("members").get(attributeName).in(member));
 		}
 
