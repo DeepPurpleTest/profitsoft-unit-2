@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.model.dto.ImportDto;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.example.profitsoftunit2.model.dto.ProjectDto;
@@ -28,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -130,6 +132,8 @@ class ProjectControllerIntegrationTest {
 						.accept(MediaType.APPLICATION_JSON)
 						.characterEncoding("utf-8"))
 				.andExpect(status().isBadRequest())
+				.andExpect(result ->
+						assertThat(result.getResolvedException()).isInstanceOf(EntityValidationException.class))
 				.andReturn();
 	}
 

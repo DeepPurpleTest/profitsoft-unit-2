@@ -3,6 +3,7 @@ package org.example.profitsoftunit2.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import org.example.profitsoftunit2.exception.EntityValidationException;
 import org.example.profitsoftunit2.model.dto.MemberDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -77,6 +79,8 @@ class MemberControllerIntegrationTest {
 						.accept(MediaType.APPLICATION_JSON)
 						.characterEncoding("utf-8"))
 				.andExpect(status().isBadRequest())
+				.andExpect(result ->
+						assertThat(result.getResolvedException()).isInstanceOf(EntityValidationException.class))
 				.andReturn();
 	}
 
