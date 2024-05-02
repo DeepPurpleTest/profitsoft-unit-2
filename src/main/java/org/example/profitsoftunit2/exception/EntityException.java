@@ -1,8 +1,7 @@
 package org.example.profitsoftunit2.exception;
 
 /**
- * Abstract class for all custom exceptions with field causedBy
- * causedBy used if the exception was raised in response to a caught exception
+ * Abstract class for all custom exceptions
  */
 public abstract class EntityException extends RuntimeException {
 

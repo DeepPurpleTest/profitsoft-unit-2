@@ -24,14 +24,15 @@ public interface ProjectService {
 
 	/**
 	 * Method for update Project by id
-	 * Include update name, description and members of project
+	 * Include update name, description and members of project <br/>
+	 * Task update not allowed
 	 */
 	ProjectDto updateProjectById(ProjectDto projectDto, Long id);
 
 	void deleteProjectById(Long id);
 
 	/**
-	 * Method supports filtering by three fields: projectName, membersIds, membersNames with pagination
+	 * Method supports filtering by three fields: projectName, membersIds, membersNames with pagination <br/>
 	 * All filters are applied using the "AND" query logic
 	 * For example, a project with a specified name and not containing all specified member IDs will not be returned
 	 */

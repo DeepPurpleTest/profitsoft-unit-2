@@ -16,7 +16,7 @@ public interface TaskService {
 	void deleteById(Long id);
 
 	/**
-	 * Method for update Task by id
+	 * Method for update Task by id <br/>
 	 * Change project id not allowed
 	 */
 	TaskDto updateTaskById(TaskDto taskDto, Long id);
