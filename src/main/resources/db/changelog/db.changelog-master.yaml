@@ -8,6 +8,10 @@ databaseChangeLog:
       file: db/changelog/changeset/create-project-member-table.yaml
   - include:
       file: db/changelog/changeset/create-task-table.yaml
+  - include:
+      file: db/changelog/changeset/create-project-name-index.yaml
+  - include:
+      file: db/changelog/changeset/create-project-member-index.yaml
 
   ### datasets
   - include:

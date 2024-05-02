@@ -41,7 +41,6 @@ public class Project {
 	@ToString.Exclude
 	private Set<Task> tasks = new HashSet<>();
 
-	//Cascade?
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "project_member",

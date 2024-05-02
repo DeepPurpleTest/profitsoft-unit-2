@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-index-to-project-member
+      author: Moksem
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: project_member
+
+      changes:
+        - createIndex:
+            indexName: project_member_idx
+            tableName: project_member
+            columns:
+              - column:
+                  name: member_id
