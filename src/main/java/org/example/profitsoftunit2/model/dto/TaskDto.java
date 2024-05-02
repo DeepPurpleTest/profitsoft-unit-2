@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Class used for work with Task entity
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -39,14 +39,15 @@ public class FileGeneratorServiceImpl implements FileGeneratorService {
 
 	public ResponseEntity<byte[]> createExcelFileResponse(ProjectsSearchDto projectsSearchDto,
 														  Class<?> type,
-														  String sheetName) throws IllegalAccessException {
+														  String sheetName,
+														  String fileName) throws IllegalAccessException {
 		List<Object> objects = new ArrayList<>(projectService.findAll(projectsSearchDto));
 
 		byte[] fileContent = generateFile(objects, type, sheetName);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-		headers.setContentDispositionFormData("attachment", "projects.xlsx");
+		headers.setContentDispositionFormData("attachment", fileName);
 
 		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
 	}

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Service responsible for performing operations with Member entities
+ */
 public interface MemberService {
 
 	Optional<Member> findByIdAndProjectId(Long id, Long projectId);
@@ -19,5 +22,9 @@ public interface MemberService {
 
 	void deleteById(Long id);
 
+	/**
+	 * Method for update Member by id
+	 * Include update name and email of member
+	 */
 	MemberDto updateMemberById(MemberDto memberDto, Long id);
 }

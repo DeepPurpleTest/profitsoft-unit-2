@@ -8,12 +8,19 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * Custom api response while get errors
+ */
 @Getter
 @Setter
 public class ApiError {
 
 	private String message;
 
+	/**
+	 * Sub errors like many fields validation
+	 * k - field, v - message with error
+	 */
 	private Map<String, String> errors;
 
 	private String stackTrace;

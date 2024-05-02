@@ -11,6 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service responsible for performing operations with Project entities
+ */
 public interface ProjectService {
 
 	void createProject(ProjectSaveDto projectDto);
@@ -19,13 +22,32 @@ public interface ProjectService {
 
 	Optional<Project> findById(Long id);
 
+	/**
+	 * Method for update Project by id
+	 * Include update name, description and members of project
+	 */
 	ProjectDto updateProjectById(ProjectDto projectDto, Long id);
 
 	void deleteProjectById(Long id);
 
-	ProjectsResponseDto findAllWithPagination(ProjectsSearchDto searchDto);
+	/**
+	 * Method supports filtering by three fields: projectName, membersIds, membersNames with pagination
+	 * All filters are applied using the "AND" query logic
+	 * For example, a project with a specified name and not containing all specified member IDs will not be returned
+	 */
+	ProjectsResponseDto findAllWithFiltrationAndPagination(ProjectsSearchDto searchDto);
 
+	/**
+	 * Method supports filtering by three fields: projectName, membersIds, membersNames
+	 * All filters are applied using the "AND" query logic
+	 * For example, a project with a specified name and not containing all specified member IDs will not be returned
+	 */
 	List<ProjectDto> findAll(ProjectsSearchDto searchDto);
 
+	/**
+	 * Method for uploading data from a file to the database
+	 * This method can create projects with members, but tasks are not allowed
+	 * If the linked member entity is not found in the database, the project will not be saved
+	 */
 	ImportDto uploadDataFromFileToDb(MultipartFile multipartFile);
 }

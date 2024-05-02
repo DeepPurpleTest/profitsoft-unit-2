@@ -62,7 +62,6 @@ public class ProjectServiceImpl implements ProjectService {
 		return projectRepository.findById(id);
 	}
 
-	//TODO all field requested and need to check if they are relevant
 	@Override
 	public ProjectDto updateProjectById(ProjectDto projectDto, Long id) {
 		Optional<Project> byId = projectRepository.findById(id);
@@ -85,9 +84,8 @@ public class ProjectServiceImpl implements ProjectService {
 		projectRepository.deleteById(id);
 	}
 
-	//TODO not all project fields
 	@Override
-	public ProjectsResponseDto findAllWithPagination(ProjectsSearchDto searchDto) {
+	public ProjectsResponseDto findAllWithFiltrationAndPagination(ProjectsSearchDto searchDto) {
 		List<Project> projects = projectRepository.findWithFiltrationAndPagination(searchDto);
 		List<SimpleProjectDto> projectsDtos = projectMapper.mapAllToSimpleDto(projects);
 		long count = projectRepository.count();

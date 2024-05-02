@@ -10,6 +10,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract class for reading data from files
+ * This class provides a template for processing files and extracting data
+ */
 @Slf4j
 @AllArgsConstructor
 public abstract class AbstractFileProcessor<T> implements FileProcessor<T> {

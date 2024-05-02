@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Class that used for response when accessing /api/projects/upload endpoint
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

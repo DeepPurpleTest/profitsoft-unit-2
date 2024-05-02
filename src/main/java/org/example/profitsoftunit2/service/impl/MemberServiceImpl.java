@@ -60,7 +60,6 @@ public class MemberServiceImpl implements MemberService {
 		memberRepository.deleteById(id);
 	}
 
-	//TODO all field requested and need to check if the are relevant
 	@Override
 	public MemberDto updateMemberById(MemberDto memberDto, Long id) {
 		Optional<Member> byId = memberRepository.findById(id);

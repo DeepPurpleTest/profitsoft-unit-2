@@ -29,6 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+/**
+ * Controller for entity Project
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/projects")
@@ -78,7 +81,7 @@ public class ProjectController {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		return projectService.findAllWithPagination(projectsSearchDto);
+		return projectService.findAllWithFiltrationAndPagination(projectsSearchDto);
 	}
 
 	@PostMapping("/upload")
@@ -95,6 +98,7 @@ public class ProjectController {
 			throw new EntityValidationException("Incorrect search data", bindingResult);
 		}
 
-		return fileGeneratorService.createExcelFileResponse(projectsSearchDto, ProjectDto.class, "Projects");
+		return fileGeneratorService.createExcelFileResponse(projectsSearchDto,
+				ProjectDto.class, "Projects", "projects.xlsx");
 	}
 }

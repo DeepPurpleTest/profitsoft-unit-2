@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Entity class representing a Task in the database
+ */
 @Entity
 @Getter
 @Setter

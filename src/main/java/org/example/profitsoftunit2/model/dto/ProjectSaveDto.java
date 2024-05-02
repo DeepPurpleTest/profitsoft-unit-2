@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO class used for creating a new project with a name and description
+ * This class is intended for creating empty projects, specifying only the name and description
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

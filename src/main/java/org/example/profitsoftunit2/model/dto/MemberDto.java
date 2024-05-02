@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Class that represents response while working with Member entity
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

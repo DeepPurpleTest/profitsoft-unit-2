@@ -11,11 +11,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Custom exception handler
+ */
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class EntityExceptionHandler {
 
 	private final ExceptionWrapper exceptionWrapper;
+
+	/**
+	 * Handle custom EntityValidation exception
+	 * If exception have binding result then generate more detailed response with the fields and their errors
+	 */
 	@ExceptionHandler({EntityValidationException.class})
 	public ResponseEntity<Object> validationExceptionResponse(EntityValidationException e) {
 		ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);

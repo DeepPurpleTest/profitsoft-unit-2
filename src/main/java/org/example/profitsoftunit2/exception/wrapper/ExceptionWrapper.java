@@ -11,9 +11,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class for build responses while exception is handled
+ */
 @Component
 public class ExceptionWrapper {
 
+	/**
+	 * Method for building response with binding result
+	 */
 	public ResponseEntity<Object> of(ApiError apiError,
 									 EntityException e, BindingResult bindingResult) {
 		Map<String, String> errors = new HashMap<>();

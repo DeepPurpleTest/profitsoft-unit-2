@@ -20,6 +20,9 @@ import lombok.ToString;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity class representing a Project in the database
+ */
 @Entity
 @Getter
 @Setter

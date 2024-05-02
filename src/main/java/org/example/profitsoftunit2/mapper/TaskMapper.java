@@ -11,6 +11,10 @@ import java.util.List;
 import static org.mapstruct.ReportingPolicy.ERROR;
 import static org.mapstruct.ReportingPolicy.IGNORE;
 
+/**
+ * Class that have @Mapper annotation from mapstruct dependency
+ * Generate methods for map Task entity in dto and conversely
+ */
 @Mapper(unmappedTargetPolicy = ERROR,
 		unmappedSourcePolicy = IGNORE,
 		componentModel = MappingConstants.ComponentModel.SPRING)

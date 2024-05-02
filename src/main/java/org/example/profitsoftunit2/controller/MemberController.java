@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Controller for entity Member
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/members")

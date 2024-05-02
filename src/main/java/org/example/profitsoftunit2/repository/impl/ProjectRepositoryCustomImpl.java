@@ -17,13 +17,20 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Custom repository implementation using Criteria API
+ * This repository is used when we need to find Project data with filtration
+ */
 @Repository
 @RequiredArgsConstructor
 public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 
 	private final EntityManager entityManager;
 
-	//TODO refactor methods
+
+	/**
+	 * Finds projects with filtration and pagination based on the provided searchDto
+	 * */
 	@Override
 	public List<Project> findWithFiltrationAndPagination(ProjectsSearchDto searchDto) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -37,6 +44,9 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 		return typedQuery.getResultList();
 	}
 
+	/**
+	 * Finds projects with filtration based on the provided searchDto
+	 */
 	@Override
 	public List<Project> findWithFiltration(ProjectsSearchDto searchDto) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
