@@ -86,7 +86,7 @@ public class ProjectController {
 		return projectService.findAllWithFiltrationAndPagination(projectsSearchDto);
 	}
 
-	@PostMapping("/upload")
+	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public ImportDto uploadFile(@RequestParam("file") MultipartFile file) {
 		return projectService.uploadDataFromFileToDb(file);
