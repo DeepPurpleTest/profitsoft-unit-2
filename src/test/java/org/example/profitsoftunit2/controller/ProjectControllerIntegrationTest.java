@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -210,8 +209,6 @@ class ProjectControllerIntegrationTest {
 				.andReturn();
 
 		byte[] content = result.getResponse().getContentAsByteArray();
-
-		System.out.println(Arrays.toString(content));
 
 		ByteArrayInputStream bis = new ByteArrayInputStream(content);
 		Workbook workbook = WorkbookFactory.create(bis);

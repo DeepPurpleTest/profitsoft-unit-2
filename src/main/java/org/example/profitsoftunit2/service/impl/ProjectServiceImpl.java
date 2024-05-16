@@ -63,6 +63,7 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
+	@Transactional
 	public ProjectDto updateProjectById(ProjectDto projectDto, Long id) {
 		Optional<Project> byId = projectRepository.findById(id);
 
@@ -76,6 +77,7 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteProjectById(Long id) {
 		if (!projectRepository.existsById(id)) {
 			throw new EntityNotFoundException(String.format("Project with id:%d is not found", id));

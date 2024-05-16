@@ -45,6 +45,7 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(Long id) {
 		if (!taskRepository.existsById(id)) {
 			throw new EntityNotFoundException(String.format("Task with id:%d is not found", id));

@@ -66,6 +66,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	@Transactional
 	public MemberDto updateMemberById(MemberDto memberDto, Long id) {
 		Optional<Member> byId = memberRepository.findById(id);
 

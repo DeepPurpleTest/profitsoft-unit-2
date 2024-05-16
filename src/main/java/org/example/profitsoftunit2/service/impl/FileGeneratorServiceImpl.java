@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.profitsoftunit2.exception.FileIOException;
 import org.example.profitsoftunit2.model.dto.ProjectsSearchDto;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.service.FileGeneratorService;
@@ -41,7 +42,7 @@ public class FileGeneratorServiceImpl implements FileGeneratorService {
 	public ResponseEntity<byte[]> createExcelFileResponse(ProjectsSearchDto projectsSearchDto,
 														  Class<?> type,
 														  String sheetName,
-														  String fileName) throws IllegalAccessException {
+														  String fileName) throws IllegalAccessException, FileIOException {
 		List<Object> objects = new ArrayList<>(projectService.findAll(projectsSearchDto));
 
 		byte[] fileContent = generateFile(objects, type, sheetName);
@@ -58,8 +59,8 @@ public class FileGeneratorServiceImpl implements FileGeneratorService {
 		return headers;
 	}
 
-	private byte[] generateFile(List<Object> objects, Class<?> type, String sheetName) throws IllegalAccessException {
-		Workbook workbook = new XSSFWorkbook();
+	private byte[] generateFile(List<Object> objects, Class<?> type, String sheetName) throws IllegalAccessException, FileIOException {
+		Workbook workbook = getWorkbook();
 		Sheet sheet = workbook.createSheet(sheetName);
 
 		createHeaderRow(sheet);
@@ -71,9 +72,12 @@ public class FileGeneratorServiceImpl implements FileGeneratorService {
 
 			return outputStream.toByteArray();
 		} catch (IOException e) {
-			log.error(e.getMessage());
-			return new byte[0];
+			throw new FileIOException("Error while writing in file");
 		}
+	}
+
+	private XSSFWorkbook getWorkbook() {
+		return new XSSFWorkbook();
 	}
 
 	private void createHeaderRow(Sheet sheet) {
