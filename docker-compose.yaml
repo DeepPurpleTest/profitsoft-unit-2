@@ -1,6 +1,31 @@
 version: '3.8'
 
 services:
+  kafka:
+    image: docker.io/bitnami/kafka:3.6.1-debian-11-r6
+    container_name: kafka
+    ports:
+      - '9092:9092'
+      - '9095:9095'
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - BITNAMI_DEBUG=yes
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9095
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,EXTERNAL://localhost:9095
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@127.0.0.1:9093
+      - KAFKA_CFG_NUM_PARTITIONS=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - unit-2
+
   db:
     image: postgres:latest
     container_name: unit-2-db
@@ -20,29 +45,47 @@ services:
     networks:
       - unit-2
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: unit-2-backend
-    environment:
-      - APP_PORT=${APP_PORT}
-      - EXTERNAL_DB_PORT=${EXTERNAL_DB_PORT}
-      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=db
-      - "spring.profiles.active=prod"
-    ports:
-      - ${APP_PORT}:${APP_PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - unit-2
+#  kafka-ui:
+#    container_name: kafka-ui
+#    image: provectuslabs/kafka-ui:latest
+#    ports:
+#      - '8082:8080'
+#    environment:
+#      KAFKA_CLUSTERS_0_NAME: kafka-cluster
+#      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+#      DYNAMIC_CONFIG_ENABLED: true
+#    depends_on:
+#      - kafka
+#    networks:
+#      - unit-2
+
+#  backend:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: unit-2-backend
+#    environment:
+#      - APP_PORT=${APP_PORT}
+#      - EXTERNAL_DB_PORT=${EXTERNAL_DB_PORT}
+#      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
+#      - DB_USERNAME=${DB_USERNAME}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#      - DB_HOST=db
+#      - "spring.profiles.active=prod"
+#    ports:
+#      - ${APP_PORT}:${APP_PORT}
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_started
+#    networks:
+#      - unit-2
 
 volumes:
   pg_data:
+    driver: local
+  kafka_data:
     driver: local
 
 networks:
