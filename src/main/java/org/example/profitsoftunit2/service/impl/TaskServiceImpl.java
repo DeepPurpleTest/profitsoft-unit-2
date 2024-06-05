@@ -38,7 +38,10 @@ public class TaskServiceImpl implements TaskService {
 		setUpTask(task);
 
 		Task createdTask = taskRepository.save(task);
-		taskEventService.produceCreateEvent(createdTask);
+
+		if (createdTask.getAssignee() != null) {
+			taskEventService.produceCreateEvent(createdTask);
+		}
 	}
 
 	@Override

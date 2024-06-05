@@ -7,6 +7,8 @@ import org.example.profitsoftunit2.model.entity.Task;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -17,13 +19,9 @@ public class TaskEventService {
 	public void produceCreateEvent(Task task) {
 		TaskCreateEvent event = TaskCreateEvent.builder()
 				.taskName(task.getName())
-				.taskDescription(task.getDescription())
-				.receiverEmail(task.getReporter().getEmail())
+				.reporterName(task.getReporter().getName())
+				.assigneeEmail(task.getAssignee().getEmail())
 				.build();
-
-		if (task.getAssignee() != null) {
-			event.setAssigneeEmail(task.getAssignee().getEmail());
-		}
 
 		log.info("Event: {}", event);
 		kafkaTemplate.send("task-create", event);

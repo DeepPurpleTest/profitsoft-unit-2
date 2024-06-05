@@ -13,9 +13,7 @@ public class TaskCreateEvent {
 
 	private String taskName;
 
-	private String taskDescription;
+	private String reporterName;
 
 	private String assigneeEmail;
-
-	private String receiverEmail;
 }
