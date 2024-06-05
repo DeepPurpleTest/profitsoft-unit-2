@@ -27,6 +27,7 @@ public class TaskServiceImpl implements TaskService {
 	private final TaskRepository taskRepository;
 	private final ProjectService projectService;
 	private final MemberService memberService;
+	private final TaskEventService taskEventService;
 	private final TaskMapper taskMapper;
 
 	@Override
@@ -36,7 +37,8 @@ public class TaskServiceImpl implements TaskService {
 
 		setUpTask(task);
 
-		taskRepository.save(task);
+		Task createdTask = taskRepository.save(task);
+		taskEventService.produceCreateEvent(createdTask);
 	}
 
 	@Override

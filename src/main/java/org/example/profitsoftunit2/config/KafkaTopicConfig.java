@@ -24,8 +24,8 @@ public class KafkaTopicConfig {
 	}
 
 	@Bean
-	public NewTopic mailTopic() {
-		return new NewTopic("mail", 1, (short) 1);
+	public NewTopic taskCreateTopic() {
+		return new NewTopic("task-create", 1, (short) 1);
 	}
 
 }
