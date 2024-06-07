@@ -24,8 +24,13 @@ public class KafkaTopicConfig {
 	}
 
 	@Bean
-	public NewTopic taskCreateTopic() {
-		return new NewTopic("task-create", 1, (short) 1);
+	public NewTopic reporterMailsTopic() {
+		return new NewTopic("reporter-mails", 1, (short) 1);
+	}
+
+	@Bean
+	public NewTopic assigneeMailsTopic() {
+		return new NewTopic("assignee-mails", 1, (short) 1);
 	}
 
 }
