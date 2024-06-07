@@ -1,31 +1,6 @@
 version: '3.8'
 
 services:
-  kafka:
-    image: docker.io/bitnami/kafka:3.6.1-debian-11-r6
-    container_name: kafka
-    ports:
-      - '9092:9092'
-      - '9095:9095'
-    volumes:
-      - kafka_data:/var/lib/kafka/data
-    environment:
-      - KAFKA_ENABLE_KRAFT=yes
-      - BITNAMI_DEBUG=yes
-      - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9095
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,EXTERNAL://localhost:9095
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@127.0.0.1:9093
-      - KAFKA_CFG_NUM_PARTITIONS=1
-      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-      - ALLOW_PLAINTEXT_LISTENER=yes
-    networks:
-      - unit-2
-
   db:
     image: postgres:latest
     container_name: unit-2-db
@@ -45,66 +20,29 @@ services:
     networks:
       - unit-2
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.1
-    container_name: elasticsearch
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: unit-2-backend
     environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - xpack.security.enabled=false
-    volumes:
-      - es_data:/usr/share/elasticsearch/data
+      - APP_PORT=${APP_PORT}
+      - KAFKA_BOOTSTRAP_SERVER=${KAFKA_BOOTSTRAP_SERVER}
+      - EXTERNAL_DB_PORT=${EXTERNAL_DB_PORT}
+      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - "spring.profiles.active=prod"
     ports:
-      - "9200:9200"
-    networks:
-      - unit-2
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.6.1
-    container_name: kibana
+      - ${APP_PORT}:${APP_PORT}
     depends_on:
-      - elasticsearch
-    ports:
-      - '5601:5601'
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     networks:
       - unit-2
-
-#  kafka-ui:
-#    container_name: kafka-ui
-#    image: provectuslabs/kafka-ui:latest
-#    ports:
-#      - '8082:8080'
-#    environment:
-#      KAFKA_CLUSTERS_0_NAME: kafka-cluster
-#      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-#      DYNAMIC_CONFIG_ENABLED: true
-#    depends_on:
-#      - kafka
-#    networks:
-#      - unit-2
-
-#  backend:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    container_name: unit-2-backend
-#    environment:
-#      - APP_PORT=${APP_PORT}
-#      - EXTERNAL_DB_PORT=${EXTERNAL_DB_PORT}
-#      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
-#      - DB_USERNAME=${DB_USERNAME}
-#      - DB_PASSWORD=${DB_PASSWORD}
-#      - DB_HOST=db
-#      - "spring.profiles.active=prod"
-#    ports:
-#      - ${APP_PORT}:${APP_PORT}
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#      kafka:
-#        condition: service_started
-#    networks:
-#      - unit-2
 
 volumes:
   pg_data:
