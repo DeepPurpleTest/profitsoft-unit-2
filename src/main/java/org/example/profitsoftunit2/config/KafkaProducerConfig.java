@@ -21,7 +21,7 @@ public class KafkaProducerConfig {
 	private String bootstrapAddress;
 
 	@Bean
-	public ProducerFactory<String, TaskCreateEvent> taskProducerFactory() {
+	public ProducerFactory<String, TaskCreateEvent> mailProducerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
 
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
@@ -39,6 +39,6 @@ public class KafkaProducerConfig {
 
 	@Bean
 	public KafkaTemplate<String, TaskCreateEvent> kafkaTemplate() {
-		return new KafkaTemplate<>(taskProducerFactory());
+		return new KafkaTemplate<>(mailProducerFactory());
 	}
 }
