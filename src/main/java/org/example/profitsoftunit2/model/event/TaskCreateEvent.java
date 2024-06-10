@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -17,5 +17,5 @@ public class TaskCreateEvent {
 
 	private ReceiverInfo receiver;
 
-	private LocalDateTime createdAt;
+	private Instant createdAt;
 }

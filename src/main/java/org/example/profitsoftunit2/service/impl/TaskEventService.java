@@ -3,14 +3,14 @@ package org.example.profitsoftunit2.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.model.entity.Member;
+import org.example.profitsoftunit2.model.entity.Task;
 import org.example.profitsoftunit2.model.event.ReceiverInfo;
 import org.example.profitsoftunit2.model.event.TaskCreateEvent;
-import org.example.profitsoftunit2.model.entity.Task;
 import org.example.profitsoftunit2.model.event.TaskInfo;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Slf4j
 @Service
@@ -51,7 +51,7 @@ public class TaskEventService {
 						.name(receiver.getName())
 						.email(receiver.getEmail())
 						.build())
-				.createdAt(LocalDateTime.now())
+				.createdAt(Instant.now())
 				.build();
 	}
 }
