@@ -14,6 +14,9 @@ public class TaskEventRouterImpl implements EventRouter<TaskEvent> {
 	@Value(value = "${kafka.topics.assigneeTopic}")
 	private String assigneeTopic;
 
+	/**
+	 * Check event type notify and choose topic
+	 */
 	@Override
 	public String determineTopic(TaskEvent event) {
 		return switch (event.getNotificationType()) {

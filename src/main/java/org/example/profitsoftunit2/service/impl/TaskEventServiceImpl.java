@@ -19,6 +19,9 @@ public class TaskEventServiceImpl implements EventService<TaskEvent> {
 
 	private final EventRouter<TaskEvent> router;
 
+	/**
+	 * Method for producing events in kafka
+	 */
 	@Override
 	public void produceEvents(List<TaskEvent> events) {
 		for (TaskEvent event : events) {
@@ -26,6 +29,9 @@ public class TaskEventServiceImpl implements EventService<TaskEvent> {
 		}
 	}
 
+	/**
+	 * Send event in kafka with determine topic by notification type
+	 */
 	private void notify(TaskEvent event) {
 		String topic = router.determineTopic(event);
 		log.info("Event to {} topic: {}", topic, event);

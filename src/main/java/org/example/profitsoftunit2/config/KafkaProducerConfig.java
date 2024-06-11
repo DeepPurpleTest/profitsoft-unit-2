@@ -14,12 +14,19 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configuration class for setting up a Kafka producer.
+ * This class defines beans for creating a Kafka producer factory and a Kafka template for sending TaskEvent messages to Kafka topics.
+ */
 @Configuration
 public class KafkaProducerConfig {
 
 	@Value(value = "${spring.kafka.bootstrap-servers}")
 	private String bootstrapAddress;
 
+	/**
+	 * Creates a Kafka producer factory for producing TaskEvent messages.
+	 */
 	@Bean
 	public ProducerFactory<String, TaskEvent> taskEventProducerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
@@ -37,6 +44,9 @@ public class KafkaProducerConfig {
 				jsonSerializer);
 	}
 
+	/**
+	 * Creates a Kafka template for sending TaskEvent messages to Kafka topics.
+	 */
 	@Bean
 	public KafkaTemplate<String, TaskEvent> kafkaTemplate() {
 		return new KafkaTemplate<>(taskEventProducerFactory());

@@ -8,6 +8,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
+/**
+ * A class that is created to notify an external service that a task has been created
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

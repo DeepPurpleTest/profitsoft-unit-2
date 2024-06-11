@@ -20,6 +20,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskEventBuilderImpl implements EventBuilder<Task, TaskEvent> {
 
+	/**
+	 * Check type of task and create from entity events
+	 */
 	@Override
 	public List<TaskEvent> buildEvents(Task entity, EventType type) {
 		List<TaskEvent> events = new ArrayList<>();
@@ -31,6 +34,9 @@ public class TaskEventBuilderImpl implements EventBuilder<Task, TaskEvent> {
 		return events;
 	}
 
+	/**
+	 * Creates two events to send emails to the addressee and reporter
+	 */
 	private void addTaskCreateEvent(Task entity, List<TaskEvent> events, EventType type) {
 		events.add(createTaskCreateEvent(entity, entity.getReporter(),
 				NotificationType.REPORTER_NOTIFICATION, type));

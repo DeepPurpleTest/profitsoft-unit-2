@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Class for transport task data
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

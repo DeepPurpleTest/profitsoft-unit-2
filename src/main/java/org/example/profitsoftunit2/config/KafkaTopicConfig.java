@@ -10,6 +10,10 @@ import org.springframework.kafka.core.KafkaAdmin;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configuration class for defining Kafka topics.
+ * This class declares beans for creating KafkaAdmin and NewTopic instances used to manage Kafka topics.
+ */
 @Configuration
 public class KafkaTopicConfig {
 
@@ -22,6 +26,9 @@ public class KafkaTopicConfig {
 	@Value(value = "${kafka.topics.assigneeTopic}")
 	private String assigneeTopic;
 
+	/**
+	 * Creates a KafkaAdmin instance for administering Kafka topics.
+	 */
 	@Bean
 	public KafkaAdmin kafkaAdmin() {
 		Map<String, Object> configs = new HashMap<>();
@@ -29,11 +36,17 @@ public class KafkaTopicConfig {
 		return new KafkaAdmin(configs);
 	}
 
+	/**
+	 * Defines a NewTopic bean for the reporter mails topic.
+	 */
 	@Bean
 	public NewTopic reporterMailsTopic() {
 		return new NewTopic(reporterTopic, 1, (short) 1);
 	}
 
+	/**
+	 * Defines a NewTopic bean for the assignee mails topic.
+	 */
 	@Bean
 	public NewTopic assigneeMailsTopic() {
 		return new NewTopic(assigneeTopic, 1, (short) 1);

@@ -33,6 +33,9 @@ public class TaskServiceImpl implements TaskService {
 	private final TaskEventBuilderImpl taskEventBuilder;
 	private final TaskMapper taskMapper;
 
+	/**
+	 * Save task and produce events for notify members
+	 */
 	@Override
 	@Transactional
 	public void createTask(TaskDto taskDto) {

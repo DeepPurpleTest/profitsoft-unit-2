@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Class for transport receiver data like email and name
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
