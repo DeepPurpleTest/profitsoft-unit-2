@@ -10,6 +10,8 @@ import org.example.profitsoftunit2.model.dto.TaskDto;
 import org.example.profitsoftunit2.model.entity.Member;
 import org.example.profitsoftunit2.model.entity.Project;
 import org.example.profitsoftunit2.model.entity.Task;
+import org.example.profitsoftunit2.model.event.EventType;
+import org.example.profitsoftunit2.model.event.TaskEvent;
 import org.example.profitsoftunit2.repository.TaskRepository;
 import org.example.profitsoftunit2.service.MemberService;
 import org.example.profitsoftunit2.service.ProjectService;
@@ -27,7 +29,8 @@ public class TaskServiceImpl implements TaskService {
 	private final TaskRepository taskRepository;
 	private final ProjectService projectService;
 	private final MemberService memberService;
-	private final TaskEventService taskEventService;
+	private final TaskEventServiceImpl taskEventService;
+	private final TaskEventBuilderImpl taskEventBuilder;
 	private final TaskMapper taskMapper;
 
 	@Override
@@ -39,7 +42,8 @@ public class TaskServiceImpl implements TaskService {
 
 		Task createdTask = taskRepository.save(task);
 
-		taskEventService.produceNotifyEvent(createdTask);
+		List<TaskEvent> events = taskEventBuilder.buildEvents(createdTask, EventType.CREATE);
+		taskEventService.produceEvents(events);
 	}
 
 	@Override

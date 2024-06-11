@@ -23,4 +23,9 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER}
 
+kafka:
+  topics:
+    reporterTopic: reporter-mails
+    assigneeTopic: assignee-mails
+
 

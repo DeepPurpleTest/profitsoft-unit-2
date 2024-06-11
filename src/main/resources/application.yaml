@@ -23,4 +23,8 @@ spring:
   kafka:
     bootstrap-servers: 'localhost:9092'
 
+kafka:
+  topics:
+    reporterTopic: reporter-mails
+    assigneeTopic: assignee-mails
 
