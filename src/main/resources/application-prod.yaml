@@ -25,7 +25,6 @@ spring:
 
 kafka:
   topics:
-    reporterTopic: reporter-mails
-    assigneeTopic: assignee-mails
+    task: task-mails
 
 

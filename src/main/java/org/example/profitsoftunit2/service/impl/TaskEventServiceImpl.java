@@ -3,8 +3,8 @@ package org.example.profitsoftunit2.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.profitsoftunit2.model.event.TaskEvent;
-import org.example.profitsoftunit2.service.EventRouter;
 import org.example.profitsoftunit2.service.EventService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,8 @@ public class TaskEventServiceImpl implements EventService<TaskEvent> {
 
 	private final KafkaTemplate<String, TaskEvent> kafkaTemplate;
 
-	private final EventRouter<TaskEvent> router;
+	@Value(value = "${kafka.topics.task}")
+	private String taskMailsTopic;
 
 	/**
 	 * Method for producing events in kafka
@@ -33,8 +34,7 @@ public class TaskEventServiceImpl implements EventService<TaskEvent> {
 	 * Send event in kafka with determine topic by notification type
 	 */
 	private void notify(TaskEvent event) {
-		String topic = router.determineTopic(event);
-		log.info("Event to {} topic: {}", topic, event);
-		kafkaTemplate.send(topic, event);
+		log.info("Event to {} topic: {}", taskMailsTopic, event);
+		kafkaTemplate.send(taskMailsTopic, event);
 	}
 }

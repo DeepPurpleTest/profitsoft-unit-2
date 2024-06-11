@@ -20,11 +20,8 @@ public class KafkaTopicConfig {
 	@Value(value = "${spring.kafka.bootstrap-servers}")
 	private String bootstrapAddress;
 
-	@Value(value = "${kafka.topics.reporterTopic}")
-	private String reporterTopic;
-
-	@Value(value = "${kafka.topics.assigneeTopic}")
-	private String assigneeTopic;
+	@Value(value = "${kafka.topics.task}")
+	private String taskMailsTopic;
 
 	/**
 	 * Creates a KafkaAdmin instance for administering Kafka topics.
@@ -40,16 +37,8 @@ public class KafkaTopicConfig {
 	 * Defines a NewTopic bean for the reporter mails topic.
 	 */
 	@Bean
-	public NewTopic reporterMailsTopic() {
-		return new NewTopic(reporterTopic, 1, (short) 1);
-	}
-
-	/**
-	 * Defines a NewTopic bean for the assignee mails topic.
-	 */
-	@Bean
-	public NewTopic assigneeMailsTopic() {
-		return new NewTopic(assigneeTopic, 1, (short) 1);
+	public NewTopic taskMailsTopic() {
+		return new NewTopic(taskMailsTopic, 1, (short) 1);
 	}
 
 }
