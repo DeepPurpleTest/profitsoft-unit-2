@@ -17,8 +17,8 @@ public class TaskEventRouterImpl implements EventRouter<TaskEvent> {
 	@Override
 	public String determineTopic(TaskEvent event) {
 		return switch (event.getNotificationType()) {
-			case ASSIGNEE_NOTIFICATION -> reporterTopic;
-			case REPORTER_NOTIFICATION -> assigneeTopic;
+			case ASSIGNEE_NOTIFICATION -> assigneeTopic;
+			case REPORTER_NOTIFICATION -> reporterTopic;
 		};
 	}
 }
