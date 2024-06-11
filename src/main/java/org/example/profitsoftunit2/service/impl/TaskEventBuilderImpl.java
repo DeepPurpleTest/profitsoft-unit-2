@@ -25,21 +25,23 @@ public class TaskEventBuilderImpl implements EventBuilder<Task, TaskEvent> {
 		List<TaskEvent> events = new ArrayList<>();
 
 		if (type.equals(EventType.CREATE)) {
-			buildEvent(entity, events, type);
+			addTaskCreateEvent(entity, events, type);
 		}
 
 		return events;
 	}
 
-	private void buildEvent(Task entity, List<TaskEvent> events, EventType type) {
-		events.add(buildCreateEvent(entity, entity.getReporter(), NotificationType.REPORTER_NOTIFICATION, type));
+	private void addTaskCreateEvent(Task entity, List<TaskEvent> events, EventType type) {
+		events.add(createTaskCreateEvent(entity, entity.getReporter(),
+				NotificationType.REPORTER_NOTIFICATION, type));
 
 		if (entity.getAssignee() != null) {
-			events.add(buildCreateEvent(entity, entity.getAssignee(), NotificationType.ASSIGNEE_NOTIFICATION, type));
+			events.add(createTaskCreateEvent(entity, entity.getAssignee(),
+					NotificationType.ASSIGNEE_NOTIFICATION, type));
 		}
 	}
 
-	private TaskCreateEvent buildCreateEvent(Task task, Member receiver, NotificationType notificationType, EventType eventType) {
+	private TaskCreateEvent createTaskCreateEvent(Task task, Member receiver, NotificationType notificationType, EventType eventType) {
 		return TaskCreateEvent.builder()
 				.task(TaskInfo.builder()
 						.projectName(task.getProject().getName())
