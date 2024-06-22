@@ -4,6 +4,16 @@ server:
 spring:
   application:
     name: profitsoft-unit-2
+
+  config:
+    import: optional:consul:/
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        health-check-path: /health
+
   datasource:
     url: jdbc:postgresql://localhost:5432/profitsoft-unit-2
     username: postgres
@@ -26,5 +36,15 @@ spring:
 kafka:
   topics:
     task: task-mails
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: "*"
 
 
