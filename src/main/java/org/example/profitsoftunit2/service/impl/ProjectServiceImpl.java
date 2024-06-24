@@ -40,10 +40,12 @@ public class ProjectServiceImpl implements ProjectService {
 	private final ProjectMapper projectMapper;
 
 	@Override
-	public void createProject(ProjectSaveDto projectDto) {
+	public Long createProject(ProjectSaveDto projectDto) {
 		Project project = projectMapper.toEntity(projectDto);
 
-		projectRepository.save(project);
+		Project createdProject = projectRepository.save(project);
+		log.info("Project id {}", createdProject.getId());
+		return createdProject.getId();
 	}
 
 	@Override

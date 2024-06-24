@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 public interface ProjectService {
 
-	void createProject(ProjectSaveDto projectDto);
+	Long createProject(ProjectSaveDto projectDto);
 
 	ProjectDto findProjectById(Long id);
 
