@@ -20,5 +20,11 @@ spring:
       ddl-auto: none
   liquibase:
     enabled: true
+  kafka:
+    bootstrap-servers: 'localhost:9092'
+
+kafka:
+  topics:
+    task: task-mails
 
 

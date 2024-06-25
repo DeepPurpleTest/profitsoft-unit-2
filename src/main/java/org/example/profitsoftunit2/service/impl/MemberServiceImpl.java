@@ -85,7 +85,7 @@ public class MemberServiceImpl implements MemberService {
 		memberToUpdate.setEmail(memberUpdate.getEmail() == null ? member.getEmail() : memberUpdate.getEmail());
 		memberToUpdate.setProjects(member.getProjects());
 		memberToUpdate.setAssignedTasks(member.getAssignedTasks());
-		memberToUpdate.setAssignedTasks(member.getCreatedTasks());
+		memberToUpdate.setCreatedTasks(member.getCreatedTasks());
 
 		return memberToUpdate;
 	}

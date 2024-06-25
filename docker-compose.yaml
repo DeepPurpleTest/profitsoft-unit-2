@@ -27,6 +27,7 @@ services:
     container_name: unit-2-backend
     environment:
       - APP_PORT=${APP_PORT}
+      - KAFKA_BOOTSTRAP_SERVER=${KAFKA_BOOTSTRAP_SERVER}
       - EXTERNAL_DB_PORT=${EXTERNAL_DB_PORT}
       - POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
       - DB_USERNAME=${DB_USERNAME}
@@ -43,6 +44,10 @@ services:
 
 volumes:
   pg_data:
+    driver: local
+  kafka_data:
+    driver: local
+  es_data:
     driver: local
 
 networks:
