@@ -6,7 +6,7 @@ phases:
       - echo Logging into Amazon ECR started on `date`
       - aws --version
       - aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 992382404964.dkr.ecr.eu-north-1.amazonaws.com
-      - REPOSITORY_URI=992382404964.dkr.ecr.eu-north-1.amazonaws.com/profitsoft-unit-6-repo
+      - REPOSITORY_URI=992382404964.dkr.ecr.eu-north-1.amazonaws.com/profitsoft-unit-2-repo
       - echo setting image tag...
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
 
