@@ -80,15 +80,15 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 	private List<FilterStrategy> createFilterStrategyList(ProjectsSearchDto searchDto) {
 		List<FilterStrategy> predicates = new ArrayList<>();
 
-		predicates.add((root, cb) -> equalPredicate(cb, root.get("name"), searchDto.getProjectName()));
+		predicates.add((root, cb) -> likePredicate(cb, root.get("name"), searchDto.getProjectName()));
 		predicates.add((root, cb) -> cb.and(createMemberPredicate(root, searchDto.getMembersIds(), "id")));
 		predicates.add((root, cb) -> cb.and(createMemberPredicate(root, searchDto.getMembersNames(), "name")));
 
 		return predicates;
 	}
 
-	private Predicate equalPredicate(CriteriaBuilder cb, Path<String> path, String value) {
-		return value != null ? cb.equal(path, value) : cb.conjunction();
+	private Predicate likePredicate(CriteriaBuilder cb, Path<String> path, String value) {
+		return value != null && !value.isEmpty() ? cb.like(cb.lower(path), value.toLowerCase() + "%") : cb.conjunction();
 	}
 
 	private Predicate[] createMemberPredicate(Root<Project> root, List<?> dataList, String attributeName) {
