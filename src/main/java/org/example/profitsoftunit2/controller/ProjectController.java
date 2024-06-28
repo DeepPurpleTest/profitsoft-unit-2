@@ -45,12 +45,12 @@ public class ProjectController {
 
 	@PostMapping()
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createProject(@RequestBody @Valid ProjectSaveDto projectDto, BindingResult bindingResult) {
+	public Long createProject(@RequestBody @Valid ProjectSaveDto projectDto, BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) {
 			throw new EntityValidationException("Incorrect Project data", bindingResult);
 		}
 
-		projectService.createProject(projectDto);
+		return projectService.createProject(projectDto);
 	}
 
 	@GetMapping("/{id}")
